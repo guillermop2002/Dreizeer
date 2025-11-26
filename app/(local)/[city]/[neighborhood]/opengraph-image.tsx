@@ -24,7 +24,7 @@ export default async function Image({ params }: Props) {
   const displayNeighborhood = capitalize(neighborhood);
 
   // Determinar precio según el barrio usando los precios actuales del proyecto
-  // Precios centralizados: Grupos desde 20€/persona, Individual desde 30€/sesión
+  // Precios centralizados: Grupos desde 25€/persona, Individual desde 40€/sesión
   const normalizedNeighborhood = neighborhood.toLowerCase();
   const isRivas = city.toLowerCase().includes('rivas');
   const isGroupNeighborhood = normalizedNeighborhood.includes('futura') ||
@@ -32,11 +32,11 @@ export default async function Image({ params }: Props) {
     normalizedNeighborhood.includes('rivas') ||
     normalizedNeighborhood.includes('vallecas');
 
-  // Rivas y Vallecas: Grupos (desde 20€/persona)
-  // Madrid Centro: Individual (desde 30€/sesión)
+  // Rivas y Vallecas: Grupos (desde 25€/persona)
+  // Madrid Centro: Individual (desde 40€/sesión)
   const price = isGroupNeighborhood
-    ? 'Desde 20€/persona'
-    : 'Desde 30€/sesión';
+    ? 'Desde 25€/persona'
+    : 'Desde 40€/sesión';
 
   return new ImageResponse(
     (

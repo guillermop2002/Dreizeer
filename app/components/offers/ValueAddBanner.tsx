@@ -7,7 +7,7 @@ import { getCurrentMonthlyOffer } from '../../lib/config/pricing-and-offers';
  * con Schema JSON-LD para crear urgencia en buscadores.
  * 
  * Estrategia:
- * - Meses IMPARES: Valoración Biomecánica GRATIS (Valorada en 30€)
+ * - Meses IMPARES: Evaluación Funcional GRATIS (Valorada en 40€)
  * - Meses PARES: Clase Extra GRATIS (Valorada en 35€)
  * 
  * IMPORTANTE: Este es un Server Component para evitar problemas de hidratación

@@ -138,11 +138,11 @@ export function generateLocalBusinessSchema(params: LocalBusinessSchemaParams): 
   // (presencial a domicilio, online, al aire libre) y disponibilidad del entrenador
 
   // Servicios ofrecidos con precios individuales y grupales
-  // Precio individual: desde 30€
-  const individualPrice = '30';
-  // Precio grupo: desde 60€ total (20€ por persona)
-  const groupPriceTotal = '60';
-  const groupPricePerPerson = '20';
+  // Precio individual: desde 40€
+  const individualPrice = '40';
+  // Precio grupo: desde 75€ total (25€ por persona)
+  const groupPriceTotal = '75';
+  const groupPricePerPerson = '25';
 
   schema.hasOfferCatalog = {
     '@type': 'OfferCatalog',

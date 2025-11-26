@@ -47,8 +47,8 @@ export const metadata: Metadata = {
     default: "Dreizeer - Entrenador Personal en Madrid | A Domicilio y Online",
     template: "%s | Dreizeer",
   },
-  description: "Entrenador personal especializado en Madrid y Rivas-Vaciamadrid. Entrenamiento a domicilio, al aire libre y online con corrección de técnica. Precios desde 20€/persona en grupos, desde 30€/sesión individual.",
-  keywords: "entrenador personal Madrid, entrenador personal Rivas, entrenamiento a domicilio, entrenamiento online, corrección de técnica, biomecánica",
+  description: "Entrenador personal especializado en Madrid y Rivas-Vaciamadrid. Entrenamiento a domicilio, al aire libre y online con corrección de técnica. Precios desde 25€/persona en grupos, desde 40€/sesión individual.",
+  keywords: "entrenador personal Madrid, entrenador personal Rivas, entrenamiento a domicilio, entrenamiento online, corrección de técnica, máster rendimiento deportivo",
   alternates: {
     canonical: '/',
   },

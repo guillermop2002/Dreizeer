@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const displayNeighborhood = capitalize(neighborhood);
 
   const title = `Entrenador Personal en ${displayNeighborhood}, ${displayCity} | A Domicilio & Parque - Dreizeer`;
-  const description = `Entrenamiento personalizado en ${displayNeighborhood}, ${displayCity}. Servicios a domicilio y al aire libre. Precios desde 20€/persona en grupos, desde 30€/sesión individual.`;
+  const description = `Entrenamiento personalizado en ${displayNeighborhood}, ${displayCity}. Servicios a domicilio y al aire libre. Precios desde 25€/persona en grupos, desde 40€/sesión individual.`;
   const url = `${baseUrl}/${city}/${neighborhood}`;
 
   return {
@@ -213,11 +213,11 @@ export default function LocalLandingPage({ params }: Props) {
         type="local"
         data={{
           name: `Entrenador Personal en ${displayNeighborhood}, ${displayCity} - Dreizeer`,
-          description: `Entrenamiento personalizado en ${displayNeighborhood}, ${displayCity}. ${config.emphasis.join(', ')}. Precios desde 20€/persona en grupos, desde 30€/sesión individual.`,
+          description: `Entrenamiento personalizado en ${displayNeighborhood}, ${displayCity}. ${config.emphasis.join(', ')}. Precios desde 25€/persona en grupos, desde 40€/sesión individual.`,
           latitude: coords.lat,
           longitude: coords.lng,
           radius: coords.radius,
-          priceRange: `desde 20€`,
+          priceRange: `desde 25€`,
           address: {
             addressLocality: displayCity,
             addressRegion: 'Comunidad de Madrid',
@@ -499,7 +499,7 @@ export default function LocalLandingPage({ params }: Props) {
                     Entrenamiento Individual
                   </h3>
                   <p className="text-3xl font-bold mb-2" style={{ color: 'var(--color-brand-primary)' }}>
-                    desde 30€
+                    desde 40€
                   </p>
                   <p className="text-sm" style={{ color: '#9ca3af' }}>
                     /sesión individual
@@ -523,13 +523,13 @@ export default function LocalLandingPage({ params }: Props) {
                     Grupo de 3 Personas
                   </h3>
                   <p className="text-3xl font-bold mb-2" style={{ color: 'var(--color-brand-primary)' }}>
-                    desde 60€
+                    desde 75€
                   </p>
                   <p className="text-sm mb-2" style={{ color: '#9ca3af' }}>
-                    /sesión total (20€ por persona)
+                    /sesión total (25€ por persona)
                   </p>
                   <p className="text-sm font-semibold" style={{ color: 'var(--color-brand-primary)' }}>
-                    ¡Ahorra 10€ por persona por sesión!
+                    ¡Ahorra 15€ por persona por sesión!
                   </p>
                 </div>
               </div>

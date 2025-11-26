@@ -12,8 +12,8 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
 
 export const metadata: Metadata = {
   title: "Sobre Mí - Tu Entrenador Personal en Madrid | Dreizeer",
-  description: "Ciencia del Movimiento con Base en Madrid y Alcance Global. Entrenador personal especializado en biomecánica, entrenamiento híbrido y corrección de técnica.",
-  keywords: "entrenador personal Madrid, especialista biomecánica, entrenamiento híbrido, corrección técnica, entrenador certificado",
+  description: "Ciencia del Movimiento con Base en Madrid y Alcance Global. Entrenador personal especializado con Máster en Rendimiento Deportivo, entrenamiento híbrido y corrección de técnica.",
+  keywords: "entrenador personal Madrid, máster rendimiento deportivo, entrenamiento híbrido, corrección técnica, entrenador certificado",
   robots: {
     index: false,
     follow: false,
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     siteName: 'Dreizeer',
     title: 'Sobre Mí - Tu Entrenador Personal en Madrid | Dreizeer',
-    description: 'Ciencia del Movimiento con Base en Madrid y Alcance Global. Entrenador personal especializado en biomecánica, entrenamiento híbrido y corrección de técnica.',
+    description: 'Ciencia del Movimiento con Base en Madrid y Alcance Global. Entrenador personal especializado con Máster en Rendimiento Deportivo, entrenamiento híbrido y corrección de técnica.',
     url: `${baseUrl}/sobre-mi`,
     images: [
       {
@@ -48,7 +48,7 @@ const experienceTimeline = [
   },
   {
     year: "2018",
-    title: "Especialización en Biomecánica",
+    title: "Máster en Rendimiento Deportivo",
     description: "Formación avanzada en análisis del movimiento y corrección postural.",
   },
   {
@@ -71,7 +71,7 @@ const experienceTimeline = [
 // Credenciales y certificaciones
 const credentials = [
   "Certificación en Entrenamiento Personal",
-  "Especialización en Biomecánica del Movimiento",
+  "Máster en Rendimiento Deportivo",
   "Formación en Entrenamiento Funcional",
   "Experiencia con Poblaciones Especiales (Tercera Edad)",
   "Metodología de Videoanálisis y Corrección Técnica",
@@ -89,7 +89,7 @@ const faqItems = [
   },
   {
     question: "¿Qué titulación tienes?",
-    answer: "Poseo certificaciones en entrenamiento personal, especialización en biomecánica del movimiento y formación continua en entrenamiento funcional y poblaciones especiales. Mi experiencia práctica se ha desarrollado trabajando directamente con clientes desde 2015.",
+    answer: "Poseo certificaciones en entrenamiento personal, Máster en Rendimiento Deportivo y formación continua en entrenamiento funcional y poblaciones especiales. Mi experiencia práctica se ha desarrollado trabajando directamente con clientes desde 2015.",
   },
   {
     question: "¿Cómo funciona el entrenamiento online?",
@@ -118,7 +118,7 @@ export default function SobreMiPage() {
         data={{
           name: "Dreizeer",
           jobTitle: "Entrenador Personal Especializado",
-          description: "Ciencia del Movimiento con Base en Madrid y Alcance Global. Especialista en biomecánica, entrenamiento híbrido y corrección de técnica.",
+          description: "Ciencia del Movimiento con Base en Madrid y Alcance Global. Especialista con Máster en Rendimiento Deportivo, entrenamiento híbrido y corrección de técnica.",
           url: "https://dreizeer.com/sobre-mi",
           email: "dreizeer@gmail.com",
           telephone: "+34637453753",
@@ -148,7 +148,7 @@ export default function SobreMiPage() {
           <div className="absolute inset-0 z-0">
             <ImageOptimized
               src="/images/hero/entrenador-personal-hibrido-madrid-online.webp"
-              alt="Entrenador personal Dreizeer especialista en biomecánica y entrenamiento híbrido"
+              alt="Entrenador personal Dreizeer especialista en Rendimiento Deportivo y entrenamiento híbrido"
               fill
               priority
               className="object-cover opacity-30"

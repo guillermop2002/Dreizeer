@@ -5,8 +5,8 @@
  * y ofertas rotativas de Dreizeer, evitando hardcodear valores en múltiples archivos.
  * 
  * Precios actuales del proyecto:
- * - Individual: desde 30€/sesión
- * - Grupo: desde 20€/persona (pack desde 60€)
+ * - Individual: desde 40€/sesión
+ * - Grupo: desde 25€/persona (pack desde 75€)
  * - Online: desde 50€/mes
  */
 
@@ -31,16 +31,16 @@ export const PRICING_PLANS: PricingPlan[] = [
   {
     id: 'group',
     title: 'Small Group Training',
-    precioMostrado: 'Desde 20€/persona',
-    precioSchema: '20.00',
-    detalles: 'Pack mensual desde 60€',
+    precioMostrado: 'Desde 25€/persona',
+    precioSchema: '25.00',
+    detalles: 'Pack mensual desde 75€',
     tipo: 'group',
   },
   {
     id: 'individual',
     title: 'Entrenamiento 1:1',
-    precioMostrado: 'Desde 30€/sesión',
-    precioSchema: '30.00',
+    precioMostrado: 'Desde 40€/sesión',
+    precioSchema: '40.00',
     detalles: 'Sesión individual personalizada',
     tipo: 'individual',
   },
@@ -66,7 +66,7 @@ export interface MonthlyOffer {
  * 
  * Estrategia:
  * - Meses IMPARES (Enero, Marzo, Mayo, Julio, Septiembre, Noviembre):
- *   → Valoración Biomecánica GRATIS (Valorada en 30€)
+ *   → Evaluación Funcional GRATIS (Valorada en 40€)
  * 
  * - Meses PARES (Febrero, Abril, Junio, Agosto, Octubre, Diciembre):
  *   → 2ª Sesión de Técnica GRATIS (Valorada en 50€)
@@ -90,10 +90,10 @@ export function getCurrentMonthlyOffer(): MonthlyOffer {
   const isOddMonth = currentMonth % 2 === 1;
 
   if (isOddMonth) {
-    // Meses IMPARES: Valoración Biomecánica GRATIS
+    // Meses IMPARES: Evaluación Funcional GRATIS
     return {
-      title: 'Valoración Biomecánica GRATIS',
-      value: '30€',
+      title: 'Evaluación Funcional GRATIS',
+      value: '40€',
       description: 'Incluida con tu primera sesión',
       validThrough: validThroughISO,
     };
@@ -101,7 +101,7 @@ export function getCurrentMonthlyOffer(): MonthlyOffer {
     // Meses PARES: Clase Extra GRATIS
     return {
       title: 'Clase Extra GRATIS',
-      value: '35€',
+      value: '40€',
       description: 'Al contratar tu primer bono mensual',
       validThrough: validThroughISO,
     };

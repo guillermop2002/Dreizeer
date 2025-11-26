@@ -15,8 +15,8 @@ export function getWhatsAppLink(message: string): string {
  */
 export const WHATSAPP_MESSAGES = {
     general: "Hola, me gustaría información sobre entrenamiento personal.",
-    pricing_group: "Hola, me interesa el plan de Small Group Training (desde 20€). ¿Me das más info?",
-    pricing_individual: "Hola, me interesa el plan de Entrenamiento 1:1 (desde 30€). ¿Me das más info?",
+    pricing_group: "Hola, me interesa el plan de Small Group Training (desde 25€). ¿Me das más info?",
+    pricing_individual: "Hola, me interesa el plan de Entrenamiento 1:1 (desde 40€). ¿Me das más info?",
     pricing_online: "Hola, me interesa la Asesoría Híbrida Online (desde 50€). ¿Me das más info?",
     hero: "Hola, me interesa empezar a entrenar. Me gustaría más información.",
     footer: "Hola, me gustaría agendar una sesión de valoración gratuita.",

@@ -46,7 +46,7 @@ export default function TerceraEdadPage() {
         data={{
           name: "Gimnasia a Domicilio para Mayores - Dreizeer",
           description: "Ejercicios para mayores de 65 años adaptados a movilidad reducida. Gimnasia a domicilio y envejecimiento activo con entrenador personal especializado.",
-          priceRange: "desde 30€/sesión",
+          priceRange: "desde 40€/sesión",
           address: {
             addressLocality: "Madrid",
             addressRegion: 'Comunidad de Madrid',
@@ -279,7 +279,7 @@ export default function TerceraEdadPage() {
                     Entrenamiento Personal
                   </h4>
                   <p className="text-4xl font-bold mb-2" style={{ color: 'var(--color-brand-primary)' }}>
-                    desde 30€
+                    desde 40€
                   </p>
                   <p className="text-sm mb-4" style={{ color: '#9ca3af' }}>
                     /sesión individual
@@ -303,13 +303,13 @@ export default function TerceraEdadPage() {
                     Grupo de 3 (Tú + 2 amigos)
                   </h4>
                   <p className="text-4xl font-bold mb-2" style={{ color: 'var(--color-brand-primary)' }}>
-                    desde 60€
+                    desde 75€
                   </p>
                   <p className="text-sm mb-2" style={{ color: '#9ca3af' }}>
-                    /sesión total (20€ por persona)
+                    /sesión total (25€ por persona)
                   </p>
                   <p className="text-sm font-semibold" style={{ color: 'var(--color-brand-primary)' }}>
-                    ¡Ahorra 10€ por persona por sesión!
+                    ¡Ahorra 15€ por persona por sesión!
                   </p>
                 </div>
               </div>
@@ -339,7 +339,7 @@ export default function TerceraEdadPage() {
                   </p>
                   <div className="mb-4">
                     <span className="text-5xl font-bold" style={{ color: 'var(--color-brand-primary)' }}>
-                      desde 30€
+                      desde 40€
                     </span>
                     <span className="text-xl ml-2" style={{ color: '#d1d5db' }}>
                       /sesión individual
