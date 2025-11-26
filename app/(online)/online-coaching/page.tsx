@@ -13,6 +13,10 @@ export const metadata: Metadata = {
   title: "Entrenamiento Online con Corrección de Técnica | Videoanálisis - Dreizeer",
   description: "Planificación personalizada con entrenador humano real. Videoanálisis y corrección de técnica que las apps de IA no pueden ofrecer. Desde 50€/mes.",
   keywords: "corrección de técnica, videoanálisis, planificación personalizada, entrenador humano, entrenamiento online, coaching online",
+  robots: {
+    index: false,
+    follow: false,
+  },
   alternates: {
     canonical: '/online-coaching',
   },

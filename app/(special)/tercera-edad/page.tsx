@@ -13,6 +13,10 @@ export const metadata: Metadata = {
   title: "Gimnasia a Domicilio para Mayores de 65 | Envejecimiento Activo - Dreizeer",
   description: "Ejercicios para mayores de 65 años adaptados a movilidad reducida. Gimnasia a domicilio y envejecimiento activo con entrenador personal especializado.",
   keywords: "gimnasia a domicilio, envejecimiento activo, ejercicios para mayores de 65, movilidad reducida, entrenador personal tercera edad",
+  robots: {
+    index: false,
+    follow: false,
+  },
   alternates: {
     canonical: '/tercera-edad',
   },

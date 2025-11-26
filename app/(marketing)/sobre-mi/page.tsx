@@ -14,6 +14,10 @@ export const metadata: Metadata = {
   title: "Sobre Mí - Tu Entrenador Personal en Madrid | Dreizeer",
   description: "Ciencia del Movimiento con Base en Madrid y Alcance Global. Entrenador personal especializado en biomecánica, entrenamiento híbrido y corrección de técnica.",
   keywords: "entrenador personal Madrid, especialista biomecánica, entrenamiento híbrido, corrección técnica, entrenador certificado",
+  robots: {
+    index: false,
+    follow: false,
+  },
   alternates: {
     canonical: '/sobre-mi',
   },
