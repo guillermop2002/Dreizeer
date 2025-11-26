@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Nombre - Entrenador Personal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* Aplicamos la fuente Inter a todo el cuerpo del documento */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Pequeña animación para el botón de WhatsApp */
+        .whatsapp-widget:hover {
+            transform: scale(1.1);
+            transition: transform 0.2s ease-in-out;
+        }
+        /* Estilos personalizados para los modales */
+        .modal-radio:checked + label {
+            border-color: #22c55e; /* green-500 */
+            background-color: rgba(34, 197, 94, 0.1);
+        }
+        .time-slot:not([disabled]):hover {
+            background-color: #15803d; /* green-700 */
+        }
+        .time-slot-selected {
+            background-color: #22c55e !important; /* green-500 */
+            color: white !important;
+        }
+        .calendar-day:not([disabled]):hover {
+             background-color: #34d399; /* green-400 */
+             color: #111827;
+        }
+        .calendar-day-selected {
+            background-color: #22c55e !important; /* green-500 */
+            color: white !important;
+        }
+        /* Estilos para horas disponibles y ocupadas */
+        .hour-available {
+            background-color: #22c55e;
+            color: white;
+        }
+        .hour-occupied {
+            background-color: #6b7280;
+            color: #d1d5db;
+        }
+        /* Colores para los días según disponibilidad */
+        .day-high-availability {
+            background-color: rgba(34, 197, 94, 0.3); /* green-500/30 */
+            color: #86efac; /* green-300 */
+        }
+        .day-medium-availability {
+            background-color: rgba(234, 179, 8, 0.3); /* yellow-500/30 */
+            color: #fde047; /* yellow-300 */
+        }
+        .day-low-availability {
+            background-color: rgba(249, 115, 22, 0.3); /* orange-500/30 */
+            color: #fdba74; /* orange-300 */
+        }
+        .day-very-low-availability {
+            background-color: rgba(239, 68, 68, 0.3); /* red-500/30 */
+            color: #fca5a5; /* red-300 */
+        }
+
+        /* Hover states for availability days */
+        .calendar-day.day-high-availability:not([disabled]):hover {
+            background-color: rgba(34, 197, 94, 0.5);
+            color: #dcfce7; /* green-100 */
+        }
+        .calendar-day.day-medium-availability:not([disabled]):hover {
+            background-color: rgba(234, 179, 8, 0.5);
+            color: #fef9c3; /* yellow-100 */
+        }
+        .calendar-day.day-low-availability:not([disabled]):hover {
+            background-color: rgba(249, 115, 22, 0.5);
+            color: #ffedd5; /* orange-100 */
+        }
+        .calendar-day.day-very-low-availability:not([disabled]):hover {
+            background-color: rgba(239, 68, 68, 0.5);
+            color: #fee2e2; /* red-100 */
+        }
+        /* Barra de progreso para el modal de evaluación */
+        .progress-bar-container {
+            width: 100%;
+            background-color: #374151; /* gray-700 */
+            border-radius: 9999px;
+            height: 8px;
+        }
+        .progress-bar-inner {
+            background-color: #22c55e; /* green-500 */
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 0.3s ease-in-out;
+        }
+        .plan-filter-btn.active {
+            background-color: #22c55e;
+            color: white;
+        }
+        .break-inside-avoid {
+            break-inside: avoid;
+        }
+        
+        /* Estilos para el carrusel */
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.5rem;
+        }
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+        .carousel-slide {
+            min-width: 100%;
+        }
+        .carousel-nav {
+            position: absolute;
+            bottom: 1rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .carousel-dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .carousel-dot.active {
+            background-color: #22c55e;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- Widget de WhatsApp -->
+    <a href="https://wa.me/34650164383" target="_blank" rel="noopener noreferrer" class="whatsapp-widget fixed bottom-6 left-6 z-50 bg-green-500 rounded-full p-3 shadow-lg flex items-center justify-center text-white">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.267.655 4.398 1.806 6.151l-1.29 4.723 4.793-1.261z" />
+        </svg>
+    </a>
+
+    <!-- Header y Navegación -->
+    <header class="bg-gray-900/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-40">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-green-400">TU LOGO</a>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#sobre-mi" class="hover:text-green-400 transition-colors">Sobre Mí</a>
+                <a href="#servicios" class="hover:text-green-400 transition-colors">Servicios</a>
+                <a href="#galeria" class="hover:text-green-400 transition-colors">Galería</a>
+                <a href="#testimonios" class="hover:text-green-400 transition-colors">Testimonios</a>
+                <a href="#contacto" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-md font-semibold transition-colors">Contactar</a>
+            </nav>
+            <button id="mobile-menu-button" class="md:hidden text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </div>
+        <!-- Menú Móvil -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#sobre-mi" class="block py-2 hover:text-green-400">Sobre Mí</a>
+            <a href="#servicios" class="block py-2 hover:text-green-400">Servicios</a>
+            <a href="#galeria" class="block py-2 hover:text-green-400">Galería</a>
+            <a href="#testimonios" class="block py-2 hover:text-green-400">Testimonios</a>
+            <a href="#contacto" class="block mt-2 bg-green-500 hover:bg-green-600 px-4 py-2 rounded-md font-semibold text-center">Contactar</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Sección Héroe -->
+        <section class="min-h-screen flex items-center bg-cover bg-center" style="background-image: linear-gradient(rgba(17, 24, 39, 0.8), rgba(17, 24, 39, 0.8)), url('https://placehold.co/1920x1080/1f2937/34d399');">
+            <!-- Consejo: Usa una imagen tuya de alta calidad en acción, entrenando o motivando -->
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-7xl font-black uppercase tracking-wider">Transforma tu cuerpo, <br><span class="text-green-400">conquista tu mente</span></h1>
+                <p class="mt-4 text-lg md:text-xl max-w-3xl mx-auto text-gray-300">Programas de entrenamiento personalizados para que alcances tus metas de una vez por todas. ¿Empezamos?</p>
+                <a href="#servicios" class="mt-8 inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition-transform duration-300 hover:scale-105">Ver Mis Planes</a>
+            </div>
+        </section>
+
+        <!-- Sección Sobre Mí -->
+        <section id="sobre-mi" class="py-20 bg-gray-800">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="md:w-1/4">
+                         <!-- Carrusel de imágenes de perfil -->
+                        <div class="carousel-container rounded-lg shadow-2xl">
+                            <div class="carousel-track">
+                                <!-- Imagen 1 del carrusel -->
+                                <div class="carousel-slide">
+                                    <img src="perfil.jpeg" alt="Foto del entrenador personal 1" class="w-full h-auto">
+                                </div>
+                                <!-- Imagen 2 del carrusel -->
+                                <div class="carousel-slide">
+                                    <img src="perfil2.jpeg" alt="Foto del entrenador personal 2" class="w-full h-auto">
+                                </div>
+                                <!-- Imagen 3 del carrusel -->
+                                <div class="carousel-slide">
+                                    <img src="perfil3.jpeg" alt="Foto del entrenador personal 3" class="w-full h-auto">
+                                </div>
+                                <!-- Imagen 4 del carrusel -->
+                                <div class="carousel-slide">
+                                    <img src="perfil4.jpeg" alt="Foto del entrenador personal 4" class="w-full h-auto">
+                                </div>
+                                <!-- Imagen 5 del carrusel -->
+                                <div class="carousel-slide">
+                                    <img src="perfil5.jpeg" alt="Foto del entrenador personal 5" class="w-full h-auto">
+                                </div>
+                            </div>
+                            <div class="carousel-nav">
+                                <div class="carousel-dot active" data-index="0"></div>
+                                <div class="carousel-dot" data-index="1"></div>
+                                <div class="carousel-dot" data-index="2"></div>
+                                <div class="carousel-dot" data-index="3"></div>
+                                <div class="carousel-dot" data-index="4"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:w-3/4">
+                        <h2 class="text-3xl font-bold mb-4">Hola, soy <span class="text-green-400">[Tu Nombre]</span></h2>
+                        <p class="text-gray-300 mb-4">
+                            Apasionado del fitness y el bienestar con más de [X] años de experiencia ayudando a personas como tú a superar sus límites. Mi misión no es solo que consigas el físico que deseas, sino que adquieras hábitos saludables que te acompañen toda la vida.
+                        </p>
+                        <p class="text-gray-300 mb-6">
+                            Creo en un enfoque integral que combina entrenamiento efectivo, nutrición inteligente y la mentalidad correcta para garantizar resultados reales y sostenibles.
+                        </p>
+                        <a href="#contacto" class="bg-transparent border-2 border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 font-semibold py-2 px-6 rounded-lg transition-colors">Hablemos</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección Por Qué Entrenar Conmigo -->
+        <section id="por-que" class="py-20 bg-gray-900">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold mb-2">¿Por qué entrenar conmigo?</h2>
+                <p class="text-gray-400 mb-12 max-w-2xl mx-auto">Mi método se centra en la personalización, la flexibilidad y los resultados reales.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Card 1: Adaptado a ti -->
+                    <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-left">
+                        <div class="bg-green-500/10 text-green-400 rounded-lg w-16 h-16 flex items-center justify-center mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Adaptado a ti</h3>
+                        <p class="text-gray-400">Los entrenamientos se diseñan para tu condición física, objetivos y cualquier patología existente.</p>
+                    </div>
+                    <!-- Card 2: Donde tú elijas -->
+                    <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-left">
+                        <div class="bg-green-500/10 text-green-400 rounded-lg w-16 h-16 flex items-center justify-center mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Donde tú elijas</h3>
+                        <p class="text-gray-400">Entrenamientos a domicilio, en tu gimnasio comunitario o al aire libre para tu máxima comodidad.</p>
+                    </div>
+                    <!-- Card 3: Opción para Grupos -->
+                    <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-left">
+                        <div class="bg-green-500/10 text-green-400 rounded-lg w-16 h-16 flex items-center justify-center mb-6">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Opción para Grupos</h3>
+                        <p class="text-gray-400">El entrenamiento personal puede ser para grupos reducidos de hasta 3 personas por el mismo costo.</p>
+                    </div>
+                    <!-- Card 4: Mejora tu Condición -->
+                    <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-left">
+                        <div class="bg-green-500/10 text-green-400 rounded-lg w-16 h-16 flex items-center justify-center mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Mejora tu Condición</h3>
+                        <p class="text-gray-400">Entrenamiento personal dirigido a mejorar tu condición física general, fuerza y resistencia.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección Servicios -->
+        <section id="servicios" class="py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold mb-2">Mis Servicios</h2>
+                <p class="text-gray-400 mb-12 max-w-2xl mx-auto">Planes diseñados para adaptarse a tus necesidades, tu estilo de vida y tus objetivos.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Tarjeta de Servicio 1 -->
+                    <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-left transform hover:-translate-y-2 transition-transform duration-300 flex flex-col">
+                        <div class="flex-grow">
+                            <!-- IMAGEN: Icono o imagen representativa (ej. una mancuerna) -->
+                            <div class="bg-green-500/10 text-green-400 rounded-lg w-16 h-16 flex items-center justify-center mb-6">
+                                <!-- Placeholder para icono -->
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-5.747-5.747h11.494"></path><path d="M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-3">Entrenamiento en persona</h3>
+                            <p class="text-gray-400 mb-6">Atención exclusiva y un plan 100% adaptado a ti. Maximiza tus resultados con mi supervisión directa en cada sesión.</p>
+                        </div>
+                         <!-- Botones de acción -->
+                        <div class="mt-auto space-y-3">
+                            <button id="open-booking-modal" class="w-full flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <span>Reservar ahora</span>
+                            </button>
+                            <a href="#" id="view-schedule" class="w-full flex items-center justify-center text-green-400 hover:text-green-300 font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Ver agenda
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Tarjeta de Servicio 2 -->
+                    <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-left transform hover:-translate-y-2 transition-transform duration-300 flex flex-col">
+                        <div class="flex-grow">
+                             <div class="bg-green-500/10 text-green-400 rounded-lg w-16 h-16 flex items-center justify-center mb-6">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-3">Asesoramiento Online</h3>
+                            <p class="text-gray-400 mb-6">Entrena donde y cuando quieras. Recibirás tu planificación a través de una app y tendremos seguimiento semanal para ajustar tu progreso.</p>
+                        </div>
+                        <div class="mt-auto space-y-3">
+                           <button id="open-evaluation-modal" class="w-full flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                                </svg>
+                                <span>Hacer evaluación</span>
+                           </button>
+                           <button id="open-demo-modal" class="w-full flex items-center justify-center text-green-400 hover:text-green-300 font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                                </svg>
+                               <span>Probar Demo</span>
+                           </button>
+                        </div>
+                    </div>
+                    <!-- Tarjeta de Servicio 3 -->
+                    <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-left transform hover:-translate-y-2 transition-transform duration-300 flex flex-col">
+                        <div class="flex-grow">
+                             <div class="bg-green-500/10 text-green-400 rounded-lg w-16 h-16 flex items-center justify-center mb-6">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-3">Planes de Nutrición</h3>
+                            <p class="text-gray-400 mb-6">La alimentación es clave. Te ayudaré a crear un plan nutricional equilibrado y delicioso que potencie tus resultados en el gimnasio.</p>
+                        </div>
+                        <div class="mt-auto space-y-3">
+                           <button id="open-macros-modal" class="w-full flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm1 4a1 1 0 00-1 1v2a1 1 0 001 1h10a1 1 0 001-1V7a1 1 0 00-1-1H5zm0 5a1 1 0 011-1h2a1 1 0 110 2H6a1 1 0 01-1-1zm4 0a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zm-4 3a1 1 0 011-1h2a1 1 0 110 2H6a1 1 0 01-1-1zm4 0a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd" />
+                                </svg>
+                               <span>Calcular macros</span>
+                           </button>
+                           <button id="open-example-modal" class="w-full flex items-center justify-center text-green-400 hover:text-green-300 font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                               <span>Ver ejemplo 3 días</span>
+                           </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección Galería de Clientes -->
+        <section id="galeria" class="py-20 bg-gray-900">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold mb-2">Galería de Transformaciones</h2>
+                <p class="text-gray-400 mb-12 max-w-2xl mx-auto">Resultados reales de clientes comprometidos. Tu historia de éxito podría ser la siguiente.</p>
+                
+                <div class="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+                    <!-- Imagen 1 -->
+                    <div class="break-inside-avoid relative group overflow-hidden rounded-lg">
+                        <img src="imagen.jpeg" alt="Transformación cliente 1" class="w-full h-auto transform transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                            <p class="text-white font-bold">Javier R. - 12 Semanas</p>
+                        </div>
+                    </div>
+        
+                    <!-- Imagen 2 -->
+                    <div class="break-inside-avoid relative group overflow-hidden rounded-lg">
+                        <img src="imagen2.jpeg" alt="Transformación cliente 2" class="w-full h-auto transform transition-transform duration-500 group-hover:scale-110">
+                         <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                            <p class="text-white font-bold">María G. - Pérdida de 15kg</p>
+                        </div>
+                    </div>
+        
+                    <!-- Imagen 3 -->
+                     <div class="break-inside-avoid relative group overflow-hidden rounded-lg">
+                        <img src="imagen3.jpeg" alt="Transformación cliente 3" class="w-full h-auto transform transition-transform duration-500 group-hover:scale-110">
+                         <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                            <p class="text-white font-bold">Carlos S. - Ganancia Muscular</p>
+                        </div>
+                    </div>
+        
+                    <!-- Imagen 4 -->
+                    <div class="break-inside-avoid relative group overflow-hidden rounded-lg">
+                        <img src="imagen4.jpeg" alt="Transformación cliente 4" class="w-full h-auto transform transition-transform duration-500 group-hover:scale-110">
+                         <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                            <p class="text-white font-bold">Ana L. - 6 Meses</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Imagen 5 -->
+                    <div class="break-inside-avoid relative group overflow-hidden rounded-lg">
+                        <img src="imagen5.jpeg" alt="Transformación cliente 5" class="w-full h-auto transform transition-transform duration-500 group-hover:scale-110">
+                         <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                            <p class="text-white font-bold">Pedro M. - Definición</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Imagen 6 -->
+                     <div class="break-inside-avoid relative group overflow-hidden rounded-lg">
+                        <img src="imagen6.jpeg" alt="Transformación cliente 6" class="w-full h-auto transform transition-transform duration-500 group-hover:scale-110">
+                         <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                            <p class="text-white font-bold">Laura F. - Recomposición</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Imagen 7 -->
+                     <div class="break-inside-avoid relative group overflow-hidden rounded-lg">
+                        <img src="imagen7.jpeg" alt="Transformación cliente 7" class="w-full h-auto transform transition-transform duration-500 group-hover:scale-110">
+                         <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                            <p class="text-white font-bold">David B. - Cambio de hábitos</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Imagen 8 -->
+                     <div class="break-inside-avoid relative group overflow-hidden rounded-lg">
+                        <img src="imagen8.jpeg" alt="Transformación cliente 8" class="w-full h-auto transform transition-transform duration-500 group-hover:scale-110">
+                         <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                            <p class="text-white font-bold">Sofía P. - 1 Año</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección Testimonios -->
+        <section id="testimonios" class="py-20 bg-gray-800">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12">Lo que dicen mis clientes</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="testimonials-container">
+                    <!-- Las reseñas se cargarán aquí dinámicamente -->
+                </div>
+                <div class="text-center mt-12">
+                    <a href="reseña.html" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 inline-block">
+                        Comparte tu experiencia
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="contacto" class="bg-gray-900 py-16">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold mb-4">¿Listo para empezar tu cambio?</h2>
+            <p class="text-gray-400 mb-8 max-w-xl mx-auto">Envíame un mensaje y agenda una primera sesión de valoración gratuita y sin compromiso.</p>
+            <a href="https://wa.me/34650164383" target="_blank" rel="noopener noreferrer" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition-transform duration-300 hover:scale-105 inline-block">¡Contactar ahora!</a>
+            <div class="mt-12 flex justify-center space-x-6">
+                <!-- Cambia '#' por los enlaces a tus redes sociales -->
+                <a href="#" class="text-gray-400 hover:text-green-400"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069-4.85c.149-3.225 1.664-4.771 4.919-4.919 1.266-.057 1.644-.069 4.85-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.359 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.947s-.014-3.667-.072-4.947c-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.689-.073-4.948-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4s1.791-4 4-4 4 1.79 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44 1.441-.645 1.441-1.44c0-.795-.645-1.44-1.441-1.44z"/></svg></a>
+                <a href="#" class="text-gray-400 hover:text-green-400"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616v.064c0 2.299 1.634 4.218 3.803 4.654-.709.192-1.448.22-2.168.087.606 1.885 2.365 3.262 4.453 3.303-1.791 1.403-4.049 2.24-6.495 2.24-.42 0-.835-.025-1.243-.073 2.305 1.476 5.048 2.34 8.04 2.34 9.638 0 14.921-7.98 14.557-14.557 1.021-.735 1.898-1.658 2.592-2.69z"/></svg></a>
+            </div>
+            <div class="mt-12 text-gray-500 text-sm">
+                &copy; <span id="year"></span> Tu Nombre | Entrenador Personal. Todos los derechos reservados.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal de Agenda -->
+    <div id="schedule-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 rounded-2xl shadow-xl w-full max-w-4xl text-white relative max-h-[90vh] overflow-y-auto">
+             <!-- Botón de cerrar -->
+            <button id="close-schedule-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors z-10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            
+            <!-- Contenido del Modal -->
+            <div class="p-8">
+                <h2 class="text-2xl font-bold mb-2 text-green-400">Ver Agenda</h2>
+                <p class="text-gray-400 mb-6">Selecciona un día para ver las horas disponibles.</p>
+                
+                <!-- Calendario -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <button id="schedule-prev-month" class="p-2 rounded-full hover:bg-gray-700">&lt;</button>
+                        <h3 id="schedule-month-year" class="font-bold text-lg"></h3>
+                        <button id="schedule-next-month" class="p-2 rounded-full hover:bg-gray-700">&gt;</button>
+                    </div>
+                    <div id="schedule-calendar-days" class="grid grid-cols-7 gap-1 text-center text-sm font-bold text-gray-500 mb-2">
+                        <div>L</div>
+                        <div>M</div>
+                        <div>X</div>
+                        <div>J</div>
+                        <div>V</div>
+                        <div>S</div>
+                        <div>D</div>
+                    </div>
+                    <div id="schedule-calendar-grid" class="grid grid-cols-7 gap-1">
+                        <!-- Días del calendario se insertarán aquí -->
+                    </div>
+                </div>
+
+                <!-- Horas disponibles -->
+                <div id="schedule-hours-container" class="hidden">
+                    <h4 class="font-semibold text-gray-300 mb-3 text-lg">Horas disponibles para <span id="selected-date"></span></h4>
+                    <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                         <!-- Horas se insertarán aquí -->
+                    </div>
+                </div>
+
+                <!-- Leyenda de colores -->
+                <div class="mt-6 p-4 bg-gray-700 rounded-lg">
+                    <h5 class="font-semibold text-gray-300 mb-2">Leyenda de disponibilidad:</h5>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 bg-green-500/30 rounded mr-2"></div>
+                            <span>Alta (>75%)</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 bg-yellow-500/30 rounded mr-2"></div>
+                            <span>Media (50-75%)</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 bg-orange-500/30 rounded mr-2"></div>
+                            <span>Baja (25-50%)</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 bg-red-500/30 rounded mr-2"></div>
+                            <span>Muy baja (<25%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Reserva -->
+    <div id="booking-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg text-white relative">
+             <!-- Botón de cerrar -->
+            <button id="close-modal-button" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors z-10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            
+            <!-- Contenido del Modal -->
+            <div id="modal-step-1" class="p-8">
+                <h2 class="text-2xl font-bold mb-2 text-green-400">Reserva tu Sesión</h2>
+                <p class="text-gray-400 mb-6">Elige el tipo de servicio que mejor se adapte a tus necesidades.</p>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="font-semibold text-gray-300 mb-2 block">Nivel</label>
+                        <select id="level-select" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <option>Principiante</option>
+                            <option>Intermedio</option>
+                            <option>Avanzado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end">
+                    <button data-action="next" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-md font-semibold transition-colors">Siguiente</button>
+                </div>
+            </div>
+
+            <div id="modal-step-2" class="p-8 hidden">
+                 <h2 class="text-2xl font-bold mb-2 text-green-400">Elige fecha y hora</h2>
+                <p class="text-gray-400 mb-6">Selecciona un horario que se ajuste a tu disponibilidad.</p>
+                
+                <!-- Calendario -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <button id="prev-month" class="p-2 rounded-full hover:bg-gray-700">&lt;</button>
+                        <h3 id="month-year" class="font-bold text-lg"></h3>
+                        <button id="next-month" class="p-2 rounded-full hover:bg-gray-700">&gt;</button>
+                    </div>
+                    <div id="calendar-days" class="grid grid-cols-7 gap-1 text-center text-sm">
+                        <!-- Nombres de los días se insertarán aquí -->
+                    </div>
+                    <div id="calendar-grid" class="grid grid-cols-7 gap-1 mt-2">
+                        <!-- Días del calendario se insertarán aquí -->
+                    </div>
+                </div>
+
+                <!-- Horas disponibles -->
+                <div id="time-slots-container" class="mt-6 hidden">
+                    <h4 class="font-semibold text-gray-300 mb-3">Horas disponibles</h4>
+                    <div id="time-slots" class="grid grid-cols-3 gap-2">
+                         <!-- Horas se insertarán aquí -->
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button data-action="prev" class="text-gray-400 hover:text-white px-6 py-2 rounded-md font-semibold transition-colors">Atrás</button>
+                    <button data-action="next" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-md font-semibold transition-colors">Siguiente</button>
+                </div>
+            </div>
+            
+            <div id="modal-step-3" class="p-8 hidden">
+                <h2 class="text-2xl font-bold mb-2 text-green-400">Tus datos</h2>
+                <p class="text-gray-400 mb-6">Completa tus datos para proceder con la reserva.</p>
+                
+                <div class="space-y-4">
+                    <input type="text" id="full-name" placeholder="Nombre completo" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <input type="email" id="email" placeholder="Email" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <input type="tel" id="phone" placeholder="Teléfono/WhatsApp" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                
+                <div class="mt-6 flex items-center space-x-3">
+                    <input type="checkbox" id="terms-checkbox" class="h-4 w-4 rounded bg-gray-700 border-gray-600 text-green-500 focus:ring-green-500 cursor-pointer">
+                    <label for="terms-checkbox" class="text-sm text-gray-400">He leído y acepto los <a href="#" id="open-terms" class="text-green-400 hover:underline">términos y condiciones</a>.</label>
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button data-action="prev" class="text-gray-400 hover:text-white px-6 py-2 rounded-md font-semibold transition-colors">Atrás</button>
+                    <button data-action="next" id="go-to-confirmation-step" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-md font-semibold transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed" disabled>Siguiente</button>
+                </div>
+            </div>
+
+            <div id="modal-step-4" class="p-8 hidden">
+                <h2 class="text-2xl font-bold mb-2 text-green-400">Casi hemos terminado</h2>
+                <p class="text-gray-400 mb-6">¿Cómo prefieres enviar tu solicitud de reserva a Jorge?</p>
+            
+                <div class="space-y-4">
+                    <button id="send-whatsapp" class="w-full flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
+                        <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.267.655 4.398 1.806 6.151l-1.29 4.723 4.793-1.261z"></path></svg>
+                        Enviar por WhatsApp
+                    </button>
+                    <button id="send-email" class="w-full flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
+                         <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 24 24"><path d="M2.003 5.884L10 11.882l7.997-5.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884zM18 8.118l-8 6-8-6V18a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path></svg>
+                        Enviar por Gmail
+                    </button>
+                </div>
+            
+                <div class="mt-8 flex justify-start">
+                    <button data-action="prev" class="text-gray-400 hover:text-white px-6 py-2 rounded-md font-semibold transition-colors">Atrás</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal de Términos y Condiciones -->
+    <div id="terms-modal" class="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 rounded-2xl shadow-xl w-full max-w-2xl text-white relative p-8">
+             <button id="close-terms-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <h2 class="text-2xl font-bold mb-4 text-green-400">Términos y Condiciones</h2>
+            <div class="prose prose-invert max-h-[60vh] overflow-y-auto text-gray-300 space-y-4">
+                <p>A continuación se detallan los términos y condiciones del servicio de entrenamiento personal.</p>
+                <div>
+                    <h4 class="font-bold">1. Política de Cancelación</h4>
+                    <p>Las cancelaciones de sesiones deben realizarse con un preaviso mínimo de 24 horas. En caso de no cumplir con este plazo, la sesión se considerará realizada y se procederá a su cobro íntegro.</p>
+                </div>
+                 <div>
+                    <h4 class="font-bold">2. Pagos</h4>
+                    <p>Los pagos de las sesiones individuales o de los bonos mensuales se realizarán siempre por adelantado, antes del comienzo de la primera sesión del ciclo correspondiente.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold">3. Puntualidad</h4>
+                    <p>Se ruega la máxima puntualidad a la hora de inicio de la sesión. El tiempo de retraso por parte del cliente no se recuperará al finalizar la sesión.</p>
+                </div>
+                 <div>
+                    <h4 class="font-bold">4. Estado de Salud</h4>
+                    <p>El cliente declara estar en buen estado de salud para realizar la actividad física. Es responsabilidad del cliente informar al entrenador de cualquier lesión, condición médica o malestar antes, durante o después de las sesiones.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Evaluación -->
+    <div id="evaluation-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 rounded-2xl shadow-xl w-full max-w-2xl text-white relative">
+             <button id="close-evaluation-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors z-10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="p-8">
+                <!-- Progress Bar -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-semibold text-green-400">Evaluación Inicial</span>
+                        <span id="eval-step-indicator" class="text-sm text-gray-400">Paso 1 de 7</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div id="eval-progress-bar" class="progress-bar-inner" style="width: 14.2%;"></div>
+                    </div>
+                </div>
+
+                <!-- Introducción a la evaluación -->
+                <div id="eval-intro" class="mb-6 bg-gray-700/50 p-4 rounded-lg">
+                    <h4 class="font-bold text-green-400 mb-2">¿Cómo funciona el entrenamiento online?</h4>
+                    <p class="text-gray-300 text-sm mb-2">El entrenamiento online se realiza mediante rutinas a través de una aplicación. Te proporcionaré tu planificación personalizada y tendremos un seguimiento continuo vía WhatsApp o llamadas para ajustar tu progreso.</p>
+                    <p class="text-gray-300 text-sm">Para comenzar, realizaremos una videoconferencia inicial para conocerte, explicarte cómo trabajamos, evaluar tu condición física actual y conocer cualquier patología o limitación que puedas tener.</p>
+                </div>
+
+                <!-- Step 1: Objetivo -->
+                <div id="eval-step-1" class="eval-step">
+                    <h3 class="text-xl font-bold mb-1">¿Cuál es tu objetivo principal?</h3>
+                    <p class="text-gray-400 mb-6">Esto nos ayudará a enfocar tu plan.</p>
+                    <div class="space-y-3">
+                        <input type="radio" name="objetivo" id="obj-perder-peso" value="Perder peso" class="hidden modal-radio">
+                        <label for="obj-perder-peso" class="block border-2 border-gray-700 rounded-lg p-4 cursor-pointer hover:border-green-500"><strong>Perder peso:</strong> Reducir grasa corporal y tonificar.</label>
+                        
+                        <input type="radio" name="objetivo" id="obj-ganar-musculo" value="Ganar músculo" class="hidden modal-radio">
+                        <label for="obj-ganar-musculo" class="block border-2 border-gray-700 rounded-lg p-4 cursor-pointer hover:border-green-500"><strong>Ganar músculo:</strong> Aumentar masa muscular y fuerza.</label>
+
+                        <input type="radio" name="objetivo" id="obj-mejorar-resistencia" value="Mejorar resistencia" class="hidden modal-radio">
+                        <label for="obj-mejorar-resistencia" class="block border-2 border-gray-700 rounded-lg p-4 cursor-pointer hover:border-green-500"><strong>Mejorar resistencia:</strong> Aumentar capacidad cardiovascular.</label>
+
+                        <input type="radio" name="objetivo" id="obj-salud-general" value="Salud general" class="hidden modal-radio">
+                        <label for="obj-salud-general" class="block border-2 border-gray-700 rounded-lg p-4 cursor-pointer hover:border-green-500"><strong>Salud general:</strong> Mejorar bienestar y calidad de vida.</label>
+                    </div>
+                     <div class="mt-8 flex justify-end">
+                        <button data-eval-action="next" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-md font-semibold transition-colors">Siguiente</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Experiencia -->
+                <div id="eval-step-2" class="eval-step hidden">
+                    <h3 class="text-xl font-bold mb-1">¿Cuál es tu nivel de experiencia?</h3>
+                    <p class="text-gray-400 mb-6">Sé honesto/a, esto es clave para tu plan.</p>
+                     <div class="space-y-3">
+                        <input type="radio" name="experiencia" id="exp-principiante" value="Principiante" class="hidden modal-radio">
+                        <label for="exp-principiante" class="block border-2 border-gray-700 rounded-lg p-4 cursor-pointer hover:border-green-500"><strong>Principiante:</strong> Poca o ninguna experiencia en entrenamiento.</label>
+                        
+                        <input type="radio" name="experiencia" id="exp-intermedio" value="Intermedio" class="hidden modal-radio">
+                        <label for="exp-intermedio" class="block border-2 border-gray-700 rounded-lg p-4 cursor-pointer hover:border-green-500"><strong>Intermedio:</strong> Alguna experiencia, pero no constante.</label>
+
+                        <input type="radio" name="experiencia" id="exp-avanzado" value="Avanzado" class="hidden modal-radio">
+                        <label for="exp-avanzado" class="block border-2 border-gray-700 rounded-lg p-4 cursor-pointer hover:border-green-500"><strong>Avanzado:</strong> Entreno regular durante más de 1 año.</label>
+                    </div>
+                    <div class="mt-8 flex justify-between">
+                        <button data-eval-action="prev" class="text-gray-400 hover:text-white px-6 py-2 rounded-md font-semibold transition-colors">Atrás</button>
+                        <button data-eval-action="next" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-md font-semibold transition-colors">Siguiente</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Disponibilidad -->
+                <div id="eval-step-3" class="eval-step hidden">
+                    <h3 class="text-xl font-bold mb-1">¿De cuántos días dispones a la semana?</h3>
+                    <p class="text-gray-400 mb-6">Buscaremos la mejor forma de organizar tu tiempo.</p>
+                     <div class="space-y-3">
+                        <input type="radio" name="disponibilidad" id="disp-1-2" value="1-2 días" class="hidden modal-radio">
+                        <label for="disp-1-2" class="block border-2 border-gray-700 rounded-lg p-4 cursor-pointer hover:border-green-500"><strong>1-2 días por semana</strong></label>
+                        
+                        <input type="radio" name="disponibilidad" id="disp-3-4" value="3-4 días" class="hidden modal-radio">
+                        <label for="disp-3-4" class="block border-2 border-gray-700 rounded-lg p-4 cursor-pointer hover:border-green-500"><strong>3-4 días por semana</strong></label>
+
+                        <input type="radio" name="disponibilidad" id="disp-5-mas" value="5 o más días" class="hidden modal-radio">
+                        <label for="disp-5-mas" class="block border-2 border-gray-700 rounded-lg p-4 cursor-pointer hover:border-green-500"><strong>5 o más días por semana</strong></label>
+                    </div>
+                    <div class="mt-8 flex justify-between">
+                        <button data-eval-action="prev" class="text-gray-400 hover:text-white px-6 py-2 rounded-md font-semibold transition-colors">Atrás</button>
+                        <button data-eval-action="next" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-md font-semibold transition-colors">Siguiente</button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Lugar de entreno -->
+                 <div id="eval-step-4" class="eval-step hidden">
+                    <h3 class="text-xl font-bold mb-1">¿Dónde prefieres entrenar?</h3>
+                    <p class="text-gray-400 mb-6">Tu plan se adaptará al entorno que elijas.</p>
+                     <div class="space-y-3">
+                        <input type="radio" name="lugar" id="lugar-gym" value="Gimnasio" class="hidden modal-radio">
+                        <label for="lugar-gym" class="block border-2 border-gray-700 rounded-lg p-4 cursor-pointer hover:border-green-500"><strong>En el gimnasio</strong></label>
+                        
+                        <input type="radio" name="lugar" id="lugar-casa" value="En casa" class="hidden modal-radio">
+                        <label for="lugar-casa" class="block border-2 border-gray-700 rounded-lg p-4 cursor-pointer hover:border-green-500"><strong>En casa</strong></label>
+
+                        <input type="radio" name="lugar" id="lugar-aire-libre" value="Al aire libre" class="hidden modal-radio">
+                        <label for="lugar-aire-libre" class="block border-2 border-gray-700 rounded-lg p-4 cursor-pointer hover:border-green-500"><strong>Al aire libre</strong></label>
+                    </div>
+                    <div class="mt-8 flex justify-between">
+                        <button data-eval-action="prev" class="text-gray-400 hover:text-white px-6 py-2 rounded-md font-semibold transition-colors">Atrás</button>
+                        <button data-eval-action="next" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-md font-semibold transition-colors">Siguiente</button>
+                    </div>
+                </div>
+
+                <!-- Step 5: Equipamiento -->
+                <div id="eval-step-5" class="eval-step hidden">
+                    <h3 class="text-xl font-bold mb-1">¿Qué equipamiento tienes a tu disposición?</h3>
+                    <p class="text-gray-400 mb-6">Esto es importante si entrenas en casa o al aire libre.</p>
+                     <div class="space-y-3">
+                        <input type="radio" name="equipamiento" id="equip-completo" value="Equipamiento de gimnasio completo" class="hidden modal-radio">
+                        <label for="equip-completo" class="block border-2 border-gray-700 rounded-lg p-4 cursor-pointer hover:border-green-500"><strong>Completo:</strong> Acceso a un gimnasio con todo tipo de máquinas y pesos.</label>
+                        
+                        <input type="radio" name="equipamiento" id="equip-basico" value="Equipamiento básico (mancuernas, bandas)" class="hidden modal-radio">
+                        <label for="equip-basico" class="block border-2 border-gray-700 rounded-lg p-4 cursor-pointer hover:border-green-500"><strong>Básico:</strong> Tengo mancuernas, bandas elásticas, una esterilla, etc.</label>
+
+                        <input type="radio" name="equipamiento" id="equip-ninguno" value="Solo peso corporal" class="hidden modal-radio">
+                        <label for="equip-ninguno" class="block border-2 border-gray-700 rounded-lg p-4 cursor-pointer hover:border-green-500"><strong>Solo peso corporal:</strong> No tengo ningún material específico.</label>
+                    </div>
+                    <div class="mt-8 flex justify-between">
+                        <button data-eval-action="prev" class="text-gray-400 hover:text-white px-6 py-2 rounded-md font-semibold transition-colors">Atrás</button>
+                        <button data-eval-action="next" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-md font-semibold transition-colors">Siguiente</button>
+                    </div>
+                </div>
+
+                <!-- Step 6: Datos personales -->
+                 <div id="eval-step-6" class="eval-step hidden">
+                    <h3 class="text-xl font-bold mb-1">Tus datos de contacto</h3>
+                    <p class="text-gray-400 mb-6">Rellena tus datos para poder enviarte la valoración.</p>
+                    <div class="space-y-4">
+                        <input type="text" id="eval-full-name" placeholder="Nombre completo" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <input type="email" id="eval-email" placeholder="Email" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <input type="tel" id="eval-phone" placeholder="Teléfono/WhatsApp" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                     <div class="mt-8 flex justify-between">
+                        <button data-eval-action="prev" class="text-gray-400 hover:text-white px-6 py-2 rounded-md font-semibold transition-colors">Atrás</button>
+                        <button data-eval-action="next" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-md font-semibold transition-colors">Siguiente</button>
+                    </div>
+                </div>
+
+                <!-- Step 7: Final -->
+                <div id="eval-step-7" class="eval-step hidden">
+                    <h3 class="text-xl font-bold mb-1 text-green-400">¡Evaluación completada!</h3>
+                    <p class="text-gray-400 mb-6">Aquí tienes un resumen. ¿Cómo quieres enviar tu solicitud?</p>
+                    <div id="evaluation-summary" class="bg-gray-700/50 p-4 rounded-lg space-y-2 text-sm mb-6">
+                        <!-- El resumen se generará aquí -->
+                    </div>
+                    <div class="space-y-4">
+                        <button id="send-eval-whatsapp" class="w-full flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
+                            <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.267.655 4.398 1.806 6.151l-1.29 4.723 4.793-1.261z"></path></svg>
+                            Enviar por WhatsApp
+                        </button>
+                        <button id="send-eval-email" class="w-full flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
+                             <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 24 24"><path d="M2.003 5.884L10 11.882l7.997-5.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884zM18 8.118l-8 6-8-6V18a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path></svg>
+                            Enviar por Gmail
+                        </button>
+                    </div>
+                    <div class="mt-8 flex justify-start">
+                        <button data-eval-action="prev" class="text-gray-400 hover:text-white px-6 py-2 rounded-md font-semibold transition-colors">Atrás</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Demo -->
+    <div id="demo-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 rounded-2xl shadow-xl w-full max-w-md text-white relative">
+             <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-green-400">Demo de la App de Seguimiento</h2>
+                    <div class="flex items-center space-x-4">
+                         <button id="close-demo-modal" class="text-gray-500 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                     <div class="bg-black rounded-lg mb-4 shadow-lg">
+                        <video controls class="w-full rounded-lg" preload="metadata">
+                            <source src="https://www.w3schools.com/html/mov_bbb.mp4#t=0.5" type="video/mp4">
+                            Tu navegador no soporta la etiqueta de vídeo.
+                        </video>
+                     </div>
+                     <p class="text-gray-300 mb-6">Así es como verás tus rutinas y registrarás tu progreso. ¡Fácil e intuitivo!</p>
+                </div>
+                
+                <div class="bg-gray-900/50 rounded-lg p-6 text-center border border-gray-700">
+                    <h3 class="font-bold text-lg mb-2">Prueba la app en modo invitado</h3>
+                    <p class="text-gray-400 mb-4 text-sm">Accede a una rutina de demostración para experimentar la aplicación.</p>
+                    <a href="#" class="w-full block bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300 transform hover:scale-105">Acceder como invitado</a>
+                </div>
+             </div>
+        </div>
+    </div>
+
+    <!-- Modal de Calculadora de Macros -->
+    <div id="macros-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg text-white relative">
+            <button id="close-macros-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors z-10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="p-8">
+                <div id="macros-calculator-form">
+                    <h2 class="text-2xl font-bold mb-4 text-green-400">Calculadora de Calorías y Macros</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="gender" class="block text-sm font-medium text-gray-300">Género</label>
+                            <select id="gender" class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <option>Hombre</option>
+                                <option>Mujer</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="age" class="block text-sm font-medium text-gray-300">Edad</label>
+                            <input type="number" id="age" placeholder="25" class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div>
+                            <label for="weight" class="block text-sm font-medium text-gray-300">Peso (kg)</label>
+                            <input type="number" id="weight" placeholder="70" class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div>
+                            <label for="height" class="block text-sm font-medium text-gray-300">Altura (cm)</label>
+                            <input type="number" id="height" placeholder="175" class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="activity-level" class="block text-sm font-medium text-gray-300">Nivel de Actividad</label>
+                            <select id="activity-level" class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <option value="1.2">Sedentario (poco o ningún ejercicio)</option>
+                                <option value="1.375">Ligero (1-3 días/semana)</option>
+                                <option value="1.55">Moderado (3-5 días/semana)</option>
+                                <option value="1.725">Activo (6-7 días/semana)</option>
+                                <option value="1.9">Muy Activo (ejercicio físico 2 veces al día)</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-300">Objetivo</label>
+                            <div class="mt-2 space-y-2">
+                                <div class="flex items-center">
+                                    <input id="goal-loss" name="goal" type="radio" value="loss" class="h-4 w-4 text-green-600 bg-gray-700 border-gray-600 focus:ring-green-500" checked>
+                                    <label for="goal-loss" class="ml-3 block text-sm font-medium text-gray-300">Pérdida de grasa</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="goal-maintenance" name="goal" type="radio" value="maintenance" class="h-4 w-4 text-green-600 bg-gray-700 border-gray-600 focus:ring-green-500">
+                                    <label for="goal-maintenance" class="ml-3 block text-sm font-medium text-gray-300">Mantenimiento</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="goal-gain" name="goal" type="radio" value="gain" class="h-4 w-4 text-green-600 bg-gray-700 border-gray-600 focus:ring-green-500">
+                                    <label for="goal-gain" class="ml-3 block text-sm font-medium text-gray-300">Ganancia muscular</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="calculate-macros-btn" class="mt-6 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300">Calcular</button>
+                </div>
+                
+                <div id="macros-results" class="hidden text-center">
+                    <h2 class="text-2xl font-bold mb-4 text-green-400">Tus Resultados</h2>
+                    <div class="bg-gray-900/50 rounded-lg p-6 space-y-4">
+                        <div>
+                           <p class="text-sm text-gray-400">Calorías para tu objetivo</p>
+                           <p id="result-calories" class="text-3xl font-bold text-green-400">2,345 kcal</p>
+                        </div>
+                        <div class="border-t border-gray-700 my-4"></div>
+                        <p class="text-sm text-gray-400">Distribución de macronutrientes</p>
+                        <div class="grid grid-cols-3 gap-4">
+                           <div>
+                               <p class="font-bold text-lg" id="result-protein">180g</p>
+                               <p class="text-sm text-gray-500">Proteínas</p>
+                           </div>
+                            <div>
+                               <p class="font-bold text-lg" id="result-carbs">250g</p>
+                               <p class="text-sm text-gray-500">Carbohidratos</p>
+                           </div>
+                            <div>
+                               <p class="font-bold text-lg" id="result-fat">60g</p>
+                               <p class="text-sm text-gray-500">Grasas</p>
+                           </div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4">Estos son valores aproximados. Para un plan detallado, contacta conmigo.</p>
+                    <button id="recalculate-macros-btn" class="mt-6 w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300">Calcular de nuevo</button>
+               </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Plan de Ejemplo -->
+    <div id="example-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 rounded-2xl shadow-xl w-full max-w-3xl text-white relative max-h-[90vh] overflow-y-auto">
+            <button id="close-example-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors z-10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div id="plan-pdf-content" class="p-8">
+                <h2 id="plan-example-title" class="text-2xl font-bold mb-4 text-green-400">Menú de Ejemplo (Plan Perder Grasa)</h2>
+                
+                <div class="flex space-x-2 mb-6">
+                    <button class="plan-filter-btn active px-4 py-1 rounded-full text-sm" data-plan="perder-grasa">Perder grasa</button>
+                    <button class="plan-filter-btn bg-gray-700 text-gray-300 hover:bg-gray-600 px-4 py-1 rounded-full text-sm" data-plan="mantenimiento">Mantenimiento</button>
+                    <button class="plan-filter-btn bg-gray-700 text-gray-300 hover:bg-gray-600 px-4 py-1 rounded-full text-sm" data-plan="volumen">Volumen</button>
+                </div>
+                
+                <div id="plan-details" class="space-y-8">
+                    <!-- El contenido del plan se inyectará aquí con JavaScript -->
+                </div>
+    
+            </div>
+             <div class="p-8 pt-0">
+                <button id="download-plan-pdf" class="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Descargar PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+    // --- Script para el menú móvil ---
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    // --- Script para el año del footer ---
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // --- Script para el carrusel de imágenes ---
+    const carouselTrack = document.querySelector('.carousel-track');
+    const carouselSlides = document.querySelectorAll('.carousel-slide');
+    const carouselDots = document.querySelectorAll('.carousel-dot');
+    let currentSlide = 0;
+    let autoSlideInterval;
+
+    // Función para mostrar una diapositiva específica
+    const showSlide = (index) => {
+        if (index < 0) {
+            currentSlide = carouselSlides.length - 1;
+        } else if (index >= carouselSlides.length) {
+            currentSlide = 0;
+        } else {
+            currentSlide = index;
+        }
+        
+        carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+        
+        // Actualizar puntos de navegación
+        carouselDots.forEach((dot, i) => {
+            if (i === currentSlide) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    };
+
+    // Función para avanzar automáticamente
+    const autoSlide = () => {
+        showSlide(currentSlide + 1);
+    };
+
+    // Iniciar carrusel automático
+    const startAutoSlide = () => {
+        autoSlideInterval = setInterval(autoSlide, 3000); // Cambiar cada 3 segundos
+    };
+
+    // Detener carrusel automático
+    const stopAutoSlide = () => {
+        clearInterval(autoSlideInterval);
+    };
+
+    // Inicializar carrusel
+    const initCarousel = () => {
+        // Configurar eventos para los puntos de navegación
+        carouselDots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                stopAutoSlide();
+                showSlide(index);
+                startAutoSlide();
+            });
+        });
+
+        // Pausar carrusel al pasar el ratón
+        const carouselContainer = document.querySelector('.carousel-container');
+        carouselContainer.addEventListener('mouseenter', stopAutoSlide);
+        carouselContainer.addEventListener('mouseleave', startAutoSlide);
+
+        // Iniciar carrusel automático
+        startAutoSlide();
+    };
+
+    // Inicializar carrusel cuando el DOM esté cargado
+    document.addEventListener('DOMContentLoaded', initCarousel);
+
+    // --- Función para cargar horarios ocupados desde localStorage ---
+    const loadOccupiedHours = () => {
+        const savedOccupiedHours = localStorage.getItem('occupiedHours');
+        if (savedOccupiedHours) {
+            return JSON.parse(savedOccupiedHours);
+        } else {
+            // Datos por defecto si no hay nada guardado
+            return {
+                '2025-10-21': ['23:00'], // Ejemplo: el día 21 a las 23:00 ocupado
+                '2025-10-25': ['09:00', '10:00', '11:00']
+            };
+        }
+    };
+
+    // --- Script para el Modal de Agenda ---
+    const viewScheduleBtn = document.getElementById('view-schedule');
+    const closeScheduleModalBtn = document.getElementById('close-schedule-modal');
+    const scheduleModal = document.getElementById('schedule-modal');
+    const scheduleMonthYearEl = document.getElementById('schedule-month-year');
+    const schedulePrevMonthBtn = document.getElementById('schedule-prev-month');
+    const scheduleNextMonthBtn = document.getElementById('schedule-next-month');
+    const scheduleCalendarGrid = document.getElementById('schedule-calendar-grid');
+    const scheduleHoursContainer = document.getElementById('schedule-hours-container');
+    const selectedDateEl = document.getElementById('selected-date');
+
+    let scheduleCurrentDate = new Date();
+    let selectedScheduleDate = null;
+
+    // Cargar horas ocupadas desde localStorage
+    let occupiedHours = loadOccupiedHours();
+
+    // Función para formatear fecha como YYYY-MM-DD
+    const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    // Función para formatear fecha en español
+    const formatDateSpanish = (date) => {
+        return date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    };
+
+    // Función para calcular el porcentaje de horas libres
+    const calculateAvailabilityPercentage = (date) => {
+        const dateKey = formatDate(date);
+        const occupiedForDate = occupiedHours[dateKey] || [];
+        const totalHours = 16; // De 8:00 a 23:00 son 16 horas
+        const freeHours = totalHours - occupiedForDate.length;
+        return (freeHours / totalHours) * 100;
+    };
+
+    // Función para obtener la clase de disponibilidad según el porcentaje
+    const getAvailabilityClass = (percentage) => {
+        if (percentage > 75) return 'day-high-availability';
+        if (percentage > 50) return 'day-medium-availability';
+        if (percentage > 25) return 'day-low-availability';
+        return 'day-very-low-availability';
+    };
+
+    // Función para renderizar el calendario de agenda
+    const renderScheduleCalendar = () => {
+        const year = scheduleCurrentDate.getFullYear();
+        const month = scheduleCurrentDate.getMonth();
+        
+        scheduleMonthYearEl.textContent = `${scheduleCurrentDate.toLocaleString('es-ES', { month: 'long' })} ${year}`.replace(/^\w/, c => c.toUpperCase());
+
+        scheduleCalendarGrid.innerHTML = '';
+
+        const firstDayOfMonth = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        // Ajustar el primer día (Lunes = 0, Domingo = 6)
+        const adjustedFirstDay = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+
+        // Espacios vacíos para los días anteriores al primer día del mes
+        for (let i = 0; i < adjustedFirstDay; i++) {
+            scheduleCalendarGrid.innerHTML += `<div></div>`;
+        }
+
+        // Días del mes
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const isPast = date < today;
+            const availabilityPercentage = calculateAvailabilityPercentage(date);
+            const availabilityClass = getAvailabilityClass(availabilityPercentage);
+            
+            const dayButton = document.createElement('button');
+            dayButton.textContent = day;
+            dayButton.classList.add('p-2', 'rounded-full', 'transition-colors', 'calendar-day');
+            
+            if (isPast) {
+                dayButton.disabled = true;
+                dayButton.classList.add('text-gray-600', 'cursor-not-allowed', 'bg-gray-800');
+            } else {
+                dayButton.classList.add('cursor-pointer', availabilityClass);
+            }
+
+            // Resaltar día actual
+            if (date.toDateString() === today.toDateString()) {
+                dayButton.classList.add('ring-2', 'ring-white');
+            }
+            
+            // Resaltar día seleccionado
+            if (selectedScheduleDate && date.toDateString() === selectedScheduleDate.toDateString()) {
+                dayButton.classList.add('ring-2', 'ring-white', 'ring-offset-2', 'ring-offset-gray-800');
+            }
+            
+            dayButton.addEventListener('click', () => {
+                if (isPast) return;
+                
+                const prevSelected = scheduleCalendarGrid.querySelector('.calendar-day-selected');
+                if(prevSelected) prevSelected.classList.remove('calendar-day-selected');
+                
+                dayButton.classList.add('calendar-day-selected');
+                selectedScheduleDate = date;
+                
+                // Mostrar horas para el día seleccionado
+                renderScheduleHours(date);
+            });
+
+            scheduleCalendarGrid.appendChild(dayButton);
+        }
+    };
+
+    // Función para renderizar las horas de un día seleccionado
+    const renderScheduleHours = (date) => {
+        scheduleHoursContainer.classList.remove('hidden');
+        selectedDateEl.textContent = formatDateSpanish(date);
+        
+        const hoursContainer = scheduleHoursContainer.querySelector('.grid');
+        hoursContainer.innerHTML = '';
+        
+        const dateKey = formatDate(date);
+        const occupiedForDate = occupiedHours[dateKey] || [];
+        
+        // Generar horas de 8:00 a 23:00
+        for (let hour = 8; hour <= 23; hour++) {
+            const hourFormatted = `${hour.toString().padStart(2, '0')}:00`;
+            const isOccupied = occupiedForDate.includes(hourFormatted);
+            
+            const hourDiv = document.createElement('div');
+            hourDiv.textContent = hourFormatted;
+            hourDiv.classList.add('p-2', 'rounded-lg', 'text-center', 'transition-colors');
+            
+            if (isOccupied) {
+                hourDiv.classList.add('hour-occupied');
+            } else {
+                hourDiv.classList.add('hour-available');
+            }
+            
+            hoursContainer.appendChild(hourDiv);
+        }
+    };
+
+    // Event listeners para navegación del calendario de agenda
+    schedulePrevMonthBtn.addEventListener('click', () => {
+        scheduleCurrentDate.setMonth(scheduleCurrentDate.getMonth() - 1);
+        renderScheduleCalendar();
+    });
+
+    scheduleNextMonthBtn.addEventListener('click', () => {
+        scheduleCurrentDate.setMonth(scheduleCurrentDate.getMonth() + 1);
+        renderScheduleCalendar();
+    });
+
+    // Abrir y cerrar modal de agenda
+    viewScheduleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Recargar los datos antes de abrir el modal
+        occupiedHours = loadOccupiedHours();
+        scheduleModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        renderScheduleCalendar();
+    });
+
+    closeScheduleModalBtn.addEventListener('click', () => {
+        scheduleModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    });
+
+    scheduleModal.addEventListener('click', (e) => {
+        if (e.target === scheduleModal) {
+            scheduleModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // Inicializar calendario de agenda
+    renderScheduleCalendar();
+
+    // --- Script para el Modal de Reserva ---
+    const openModalBtn = document.getElementById('open-booking-modal');
+    const closeModalBtn = document.getElementById('close-modal-button');
+    const modal = document.getElementById('booking-modal');
+    const modalSteps = [
+        document.getElementById('modal-step-1'),
+        document.getElementById('modal-step-2'),
+        document.getElementById('modal-step-3'),
+        document.getElementById('modal-step-4')
+    ];
+    const navButtons = modal.querySelectorAll('[data-action]');
+    const termsCheckbox = document.getElementById('terms-checkbox');
+    const goToConfirmBtn = document.getElementById('go-to-confirmation-step');
+    const openTermsLink = document.getElementById('open-terms');
+    const termsModal = document.getElementById('terms-modal');
+    const closeTermsModalBtn = document.getElementById('close-terms-modal');
+    const sendWhatsappBtn = document.getElementById('send-whatsapp');
+    const sendEmailBtn = document.getElementById('send-email');
+    
+    let currentStep = 0;
+
+    const bookingData = {
+        level: '',
+        date: null,
+        time: '',
+        name: '',
+        email: '',
+        phone: ''
+    };
+
+    const showStep = (stepIndex) => {
+        modalSteps.forEach((step, index) => {
+            step.classList.toggle('hidden', index !== stepIndex);
+        });
+        currentStep = stepIndex;
+    };
+
+    openModalBtn.addEventListener('click', () => {
+        // Recargar los datos antes de abrir el modal de reserva
+        occupiedHours = loadOccupiedHours();
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        showStep(0);
+    });
+    
+    const closeModal = () => {
+         modal.classList.add('hidden');
+         document.body.style.overflow = 'auto';
+    }
+
+    closeModalBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    navButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const action = button.dataset.action;
+            if (action === 'next' && currentStep < modalSteps.length - 1) {
+                // Validar y recolectar datos antes de pasar al siguiente paso
+                if (currentStep === 0) { //Paso 1: Nivel
+                    bookingData.level = document.getElementById('level-select').value;
+                } else if (currentStep === 1) { // Paso 2: Fecha y Hora
+                    if (!bookingData.date || !bookingData.time) {
+                        alert('Por favor, selecciona una fecha y una hora.');
+                        return;
+                    }
+                } else if (currentStep === 2) { // Paso 3: Datos personales
+                    bookingData.name = document.getElementById('full-name').value;
+                    bookingData.email = document.getElementById('email').value;
+                    bookingData.phone = document.getElementById('phone').value;
+                    if (!bookingData.name || !bookingData.email || !bookingData.phone) {
+                        alert('Por favor, completa todos tus datos.');
+                        return;
+                    }
+                    if (!termsCheckbox.checked) {
+                        alert('Debes aceptar los términos y condiciones.');
+                        return;
+                    }
+                }
+                showStep(currentStep + 1);
+            } else if (action === 'prev' && currentStep > 0) {
+                showStep(currentStep - 1);
+            }
+        });
+    });
+    
+    // --- Lógica de Términos y Condiciones ---
+    termsCheckbox.addEventListener('change', () => {
+        goToConfirmBtn.disabled = !termsCheckbox.checked;
+    });
+
+    openTermsLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        termsModal.classList.remove('hidden');
+    });
+
+    closeTermsModalBtn.addEventListener('click', () => {
+        termsModal.classList.add('hidden');
+    });
+    termsModal.addEventListener('click', (e) => {
+        if (e.target === termsModal) {
+             termsModal.classList.add('hidden');
+        }
+    });
+
+    // --- Lógica para enviar mensajes ---
+    const generateMessage = () => {
+        if (!bookingData.date) return '';
+        const formattedDate = bookingData.date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+        const message = `Buenos días Jorge, mi nombre es ${bookingData.name}, le escribo porque me gustaría reservar fecha para el ${formattedDate} a la hora ${bookingData.time}, para tener un entrenamiento presencial. Creo que tengo un nivel ${bookingData.level}. Estoy a la espera de su confirmación, un saludo.`;
+        return message;
+    };
+
+    sendWhatsappBtn.addEventListener('click', () => {
+        const message = generateMessage();
+        if(!message) return;
+        // Número actualizado a 650164383 con código de país español (34)
+        const whatsappUrl = `https://wa.me/34650164383?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+    });
+
+    sendEmailBtn.addEventListener('click', () => {
+        const message = generateMessage();
+        if(!message) return;
+        const subject = `Solicitud de Reserva de Entrenamiento - ${bookingData.name}`;
+        
+        // URL específica de Gmail para redactar un correo
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=danisuperk@gmail.com&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+        window.open(gmailUrl, '_blank');
+    });
+
+    // --- Lógica del Calendario de Reserva ---
+    const monthYearEl = document.getElementById('month-year');
+    const prevMonthBtn = document.getElementById('prev-month');
+    const nextMonthBtn = document.getElementById('next-month');
+    const calendarGrid = document.getElementById('calendar-grid');
+    const calendarDays = document.getElementById('calendar-days');
+    const timeSlotsContainer = document.getElementById('time-slots-container');
+    const timeSlotsGrid = document.getElementById('time-slots');
+
+    let currentDate = new Date();
+    
+    const renderCalendar = () => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        monthYearEl.textContent = `${currentDate.toLocaleString('es-ES', { month: 'long' })} ${year}`.replace(/^\w/, c => c.toUpperCase());
+
+        calendarGrid.innerHTML = '';
+
+        const firstDayOfMonth = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        const adjustedFirstDay = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+
+        for (let i = 0; i < adjustedFirstDay; i++) {
+            calendarGrid.innerHTML += `<div></div>`;
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const isPast = date < today;
+            
+            const dayButton = document.createElement('button');
+            dayButton.textContent = day;
+            dayButton.classList.add('p-2', 'rounded-full', 'transition-colors', 'calendar-day');
+            if (isPast) {
+                dayButton.disabled = true;
+                dayButton.classList.add('text-gray-600', 'cursor-not-allowed');
+            } else {
+                dayButton.classList.add('cursor-pointer');
+            }
+
+            if (date.toDateString() === today.toDateString()) {
+                dayButton.classList.add('bg-green-500/30', 'text-green-300');
+            }
+            
+            dayButton.addEventListener('click', () => {
+                const prevSelected = calendarGrid.querySelector('.calendar-day-selected');
+                if(prevSelected) prevSelected.classList.remove('.calendar-day-selected');
+                
+                dayButton.classList.add('calendar-day-selected');
+                bookingData.date = date;
+                renderTimeSlots(date);
+            });
+
+            calendarGrid.appendChild(dayButton);
+        }
+    };
+
+    const renderTimeSlots = (date) => {
+        timeSlotsContainer.classList.remove('hidden');
+        timeSlotsGrid.innerHTML = '';
+        
+        // Horas disponibles por defecto
+        const defaultTimes = ['09:00', '10:30', '12:00', '16:00', '17:30', '19:00'];
+        
+        // Filtrar horas que no estén ocupadas
+        const dateKey = formatDate(date);
+        const occupiedForDate = occupiedHours[dateKey] || [];
+        const availableTimes = defaultTimes.filter(time => !occupiedForDate.includes(time));
+        
+        if (availableTimes.length === 0) {
+            timeSlotsGrid.innerHTML = '<p class="text-gray-400 col-span-3 text-center">No hay horas disponibles para este día</p>';
+            return;
+        }
+        
+        availableTimes.forEach(time => {
+            const timeButton = document.createElement('button');
+            timeButton.textContent = time;
+            timeButton.classList.add('p-2', 'rounded-lg', 'bg-gray-700', 'text-gray-300', 'transition-colors', 'time-slot', 'cursor-pointer');
+            
+            timeButton.addEventListener('click', () => {
+                const prevSelected = timeSlotsGrid.querySelector('.time-slot-selected');
+                if(prevSelected) prevSelected.classList.remove('time-slot-selected');
+                timeButton.classList.add('time-slot-selected');
+                bookingData.time = time;
+            });
+
+            timeSlotsGrid.appendChild(timeButton);
+        });
+    };
+
+    prevMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    });
+
+    nextMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    });
+    
+    const daysOfWeek = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+    daysOfWeek.forEach(day => {
+        const dayEl = document.createElement('div');
+        dayEl.textContent = day;
+        dayEl.classList.add('font-bold', 'text-gray-500');
+        calendarDays.appendChild(dayEl);
+    });
+
+    renderCalendar();
+
+    // --- Script para Modal de Evaluación ---
+    const evaluationModal = document.getElementById('evaluation-modal');
+    const openEvaluationModalBtn = document.getElementById('open-evaluation-modal');
+    const closeEvaluationModalBtn = document.getElementById('close-evaluation-modal');
+    const evalSteps = document.querySelectorAll('.eval-step');
+    const evalNavButtons = evaluationModal.querySelectorAll('[data-eval-action]');
+    const progressBar = document.getElementById('eval-progress-bar');
+    const stepIndicator = document.getElementById('eval-step-indicator');
+    const summaryContainer = document.getElementById('evaluation-summary');
+    const sendEvalWhatsappBtn = document.getElementById('send-eval-whatsapp');
+    const sendEvalEmailBtn = document.getElementById('send-eval-email');
+
+    let currentEvalStep = 0;
+    const totalEvalSteps = evalSteps.length;
+    const evaluationData = {};
+
+    const showEvalStep = (stepIndex) => {
+        evalSteps.forEach((step, index) => {
+            step.classList.toggle('hidden', index !== stepIndex);
+        });
+        currentEvalStep = stepIndex;
+        // Update progress bar
+        const progress = ((currentEvalStep + 1) / totalEvalSteps) * 100;
+        progressBar.style.width = `${progress}%`;
+        stepIndicator.textContent = `Paso ${currentEvalStep + 1} de ${totalEvalSteps}`;
+    };
+
+    openEvaluationModalBtn.addEventListener('click', () => {
+        evaluationModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        showEvalStep(0);
+    });
+
+    const closeEvaluationModal = () => {
+        evaluationModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    };
+
+    closeEvaluationModalBtn.addEventListener('click', closeEvaluationModal);
+    evaluationModal.addEventListener('click', (e) => {
+        if (e.target === evaluationModal) closeEvaluationModal();
+    });
+
+    evalNavButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const action = button.dataset.evalAction;
+            if (action === 'next' && currentEvalStep < totalEvalSteps - 1) {
+                // Validation and data collection
+                const currentStepEl = evalSteps[currentEvalStep];
+                const radioChecked = currentStepEl.querySelector('input[type="radio"]:checked');
+                const inputs = currentStepEl.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"]');
+                
+                if (radioChecked) {
+                    evaluationData[radioChecked.name] = radioChecked.value;
+                } else if (inputs.length > 0) {
+                     let allFilled = true;
+                     inputs.forEach(input => {
+                        if (!input.value) allFilled = false;
+                        evaluationData[input.id.replace('eval-', '')] = input.value;
+                     });
+                     if (!allFilled) {
+                        alert('Por favor, completa todos los campos.');
+                        return;
+                     }
+                } else {
+                    alert('Por favor, selecciona una opción.');
+                    return;
+                }
+                
+                // If moving to the last step, generate summary
+                if(currentEvalStep === totalEvalSteps - 2) {
+                    generateEvaluationSummary();
+                }
+
+                showEvalStep(currentEvalStep + 1);
+            } else if (action === 'prev' && currentEvalStep > 0) {
+                showEvalStep(currentEvalStep - 1);
+            }
+        });
+    });
+
+    const generateEvaluationSummary = () => {
+        summaryContainer.innerHTML = `
+            <p><strong>Objetivo:</strong> ${evaluationData.objetivo || 'No especificado'}</p>
+            <p><strong>Experiencia:</strong> ${evaluationData.experiencia || 'No especificada'}</p>
+            <p><strong>Disponibilidad:</strong> ${evaluationData.disponibilidad || 'No especificada'}</p>
+            <p><strong>Lugar de entreno:</strong> ${evaluationData.lugar || 'No especificado'}</p>
+            <p><strong>Equipamiento:</strong> ${evaluationData.equipamiento || 'No especificado'}</p>
+        `;
+    };
+    
+    const generateEvalMessage = () => {
+        return `¡Hola Jorge! Soy ${evaluationData['full-name']}. Acabo de completar la evaluación online y estoy interesado/a en tu asesoramiento.\n\nAquí están mis respuestas:\n- *Objetivo:* ${evaluationData.objetivo}\n- *Experiencia:* ${evaluationData.experiencia}\n- *Disponibilidad:* ${evaluationData.disponibilidad}\n- *Lugar de entreno:* ${evaluationData.lugar}\n- *Equipamiento:* ${evaluationData.equipamiento}\n\n¡Espero tu respuesta! Gracias.`;
+    };
+
+    sendEvalWhatsappBtn.addEventListener('click', () => {
+        const message = generateEvalMessage();
+        const whatsappUrl = `https://wa.me/34650164383?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+    });
+
+    sendEvalEmailBtn.addEventListener('click', () => {
+        const message = generateEvalMessage();
+        const subject = `Nueva Evaluación Online - ${evaluationData['full-name']}`;
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=danisuperk@gmail.com&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+        window.open(gmailUrl, '_blank');
+    });
+
+    // --- Script para Modal de Demo ---
+    const demoModal = document.getElementById('demo-modal');
+    const openDemoModalBtn = document.getElementById('open-demo-modal');
+    const closeDemoModalBtn = document.getElementById('close-demo-modal');
+
+    openDemoModalBtn.addEventListener('click', () => {
+        demoModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    });
+    
+    const closeDemoModal = () => {
+        demoModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    };
+
+    closeDemoModalBtn.addEventListener('click', closeDemoModal);
+    demoModal.addEventListener('click', (e) => {
+        if(e.target === demoModal) closeDemoModal();
+    });
+
+    // --- Script para Modal Calculadora de Macros ---
+    const macrosModal = document.getElementById('macros-modal');
+    const openMacrosModalBtn = document.getElementById('open-macros-modal');
+    const closeMacrosModalBtn = document.getElementById('close-macros-modal');
+    const calculateMacrosBtn = document.getElementById('calculate-macros-btn');
+    const recalculateMacrosBtn = document.getElementById('recalculate-macros-btn');
+    const macrosForm = document.getElementById('macros-calculator-form');
+    const macrosResults = document.getElementById('macros-results');
+
+    openMacrosModalBtn.addEventListener('click', () => {
+        macrosModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        macrosForm.classList.remove('hidden');
+        macrosResults.classList.add('hidden');
+    });
+
+    const closeMacrosModal = () => {
+        macrosModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    };
+
+    closeMacrosModalBtn.addEventListener('click', closeMacrosModal);
+    macrosModal.addEventListener('click', (e) => {
+        if (e.target === macrosModal) closeMacrosModal();
+    });
+
+    recalculateMacrosBtn.addEventListener('click', () => {
+        macrosForm.classList.remove('hidden');
+        macrosResults.classList.add('hidden');
+    });
+
+    calculateMacrosBtn.addEventListener('click', () => {
+        // 1. Get form values
+        const gender = document.getElementById('gender').value;
+        const age = parseInt(document.getElementById('age').value);
+        const weight = parseFloat(document.getElementById('weight').value);
+        const height = parseInt(document.getElementById('height').value);
+        const activityLevel = parseFloat(document.getElementById('activity-level').value);
+        const goal = document.querySelector('input[name="goal"]:checked').value;
+
+        // 2. Validate input
+        if (isNaN(age) || isNaN(weight) || isNaN(height) || age <= 0 || weight <= 0 || height <= 0) {
+            alert('Por favor, introduce valores válidos para edad, peso y altura.');
+            return;
+        }
+
+        // 3. Calculate BMR (Mifflin-St Jeor)
+        let bmr;
+        if (gender === 'Hombre') {
+            bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+        } else { // Mujer
+            bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+        }
+
+        // 4. Calculate TDEE (Total Daily Energy Expenditure)
+        const tdee = bmr * activityLevel;
+
+        // 5. Adjust calories for goal
+        let goalCalories;
+        switch (goal) {
+            case 'loss':
+                goalCalories = tdee - 500;
+                break;
+            case 'gain':
+                goalCalories = tdee + 300;
+                break;
+            case 'maintenance':
+            default:
+                goalCalories = tdee;
+                break;
+        }
+
+        // 6. Calculate Macros
+        // Protein: 2g per kg
+        const proteinGrams = Math.round(weight * 2);
+        const proteinCalories = proteinGrams * 4;
+
+        // Fat: 25% of total calories
+        const fatCalories = goalCalories * 0.25;
+        const fatGrams = Math.round(fatCalories / 9);
+
+        // Carbs: Remaining calories
+        const carbCalories = goalCalories - proteinCalories - fatCalories;
+        const carbGrams = Math.round(carbCalories / 4);
+
+        // 7. Display results
+        document.getElementById('result-calories').textContent = `${Math.round(goalCalories).toLocaleString('es-ES')} kcal`;
+        document.getElementById('result-protein').textContent = `${proteinGrams}g`;
+        document.getElementById('result-carbs').textContent = `${carbGrams}g`;
+        document.getElementById('result-fat').textContent = `${fatGrams}g`;
+        
+        macrosForm.classList.add('hidden');
+        macrosResults.classList.remove('hidden');
+    });
+
+
+    // --- Script para Modal de Plan de Ejemplo ---
+    const exampleModal = document.getElementById('example-modal');
+    const openExampleModalBtn = document.getElementById('open-example-modal');
+    const closeExampleModalBtn = document.getElementById('close-example-modal');
+    const downloadPdfBtn = document.getElementById('download-plan-pdf');
+    const planDetailsContainer = document.getElementById('plan-details');
+    const planFilterBtns = document.querySelectorAll('.plan-filter-btn');
+    const planExampleTitle = document.getElementById('plan-example-title');
+
+    const mealPlans = {
+        'perder-grasa': [
+            { // Day 1
+                meals: [
+                    { name: 'Desayuno', food: 'Avena con frutos rojos y nueces', kcal: '~350 kcal' },
+                    { name: 'Comida', food: 'Pollo a la plancha con quinoa y brócoli', kcal: '~450 kcal' },
+                    { name: 'Cena', food: 'Ensalada completa con atún y huevo', kcal: '~380 kcal' }
+                ]
+            },
+            { // Day 2
+                meals: [
+                    { name: 'Desayuno', food: 'Yogur griego con nueces y miel', kcal: '~280 kcal' },
+                    { name: 'Comida', food: 'Salmón al horno con brócoli', kcal: '~480 kcal' },
+                    { name: 'Cena', food: 'Crema de calabacín', kcal: '~250 kcal' }
+                ]
+            },
+            { // Day 3
+                meals: [
+                    { name: 'Desayuno', food: 'Tostadas integrales con aguacate', kcal: '~320 kcal' },
+                    { name: 'Comida', food: 'Lentejas estofadas', kcal: '~420 kcal' },
+                    { name: 'Cena', food: 'Revuelto de huevos con espinacas', kcal: '~320 kcal' }
+                ]
+            }
+        ],
+        mantenimiento: [
+            {
+                meals: [
+                    { name: 'Desayuno', food: 'Tostadas integrales con huevo revuelto y aguacate', kcal: '~450 kcal' },
+                    { name: 'Comida', food: 'Ternera guisada con patatas y zanahorias', kcal: '~600 kcal' },
+                    { name: 'Cena', food: 'Pechuga de pavo a la plancha con ensalada mixta', kcal: '~450 kcal' }
+                ]
+            },
+             {
+                meals: [
+                    { name: 'Desayuno', food: 'Gachas de avena con plátano y crema de cacahuete', kcal: '~480 kcal' },
+                    { name: 'Comida', food: 'Pasta integral con pesto, pollo y tomates cherry', kcal: '~650 kcal' },
+                    { name: 'Cena', food: 'Merluza al horno con patata panadera', kcal: '~500 kcal' }
+                ]
+            },
+             {
+                meals: [
+                    { name: 'Desayuno', food: 'Yogur griego con granola casera y fruta', kcal: '~420 kcal' },
+                    { name: 'Comida', food: 'Arroz con conejo y verduras', kcal: '~620 kcal' },
+                    { name: 'Cena', food: 'Ensalada César con pollo a la parrilla', kcal: '~480 kcal' }
+                ]
+            }
+        ],
+        volumen: [
+            {
+                meals: [
+                    { name: 'Desayuno', food: 'Tortitas de avena con 4 huevos, plátano y miel', kcal: '~650 kcal' },
+                    { name: 'Comida', food: 'Arroz blanco con 250g de pollo y almendras', kcal: '~800 kcal' },
+                    { name: 'Cena', food: 'Macarrones con carne picada de ternera y tomate', kcal: '~750 kcal' }
+                ]
+            },
+            {
+                meals: [
+                    { name: 'Desayuno', food: 'Batido con 2 plátanos, avena, proteína whey y leche entera', kcal: '~700 kcal' },
+                    { name: 'Comida', food: 'Lentejas con chorizo y patata', kcal: '~850 kcal' },
+                    { name: 'Cena', food: 'Salmón (200g) con boniato asado y aceite de oliva', kcal: '~700 kcal' }
+                ]
+            },
+            {
+                meals: [
+                    { name: 'Desayuno', food: 'Bocadillo de pan integral con pavo, queso y aguacate', kcal: '~600 kcal' },
+                    { name: 'Comida', food: 'Garbanzos con espinacas y huevo duro', kcal: '~750 kcal' },
+                    { name: 'Cena', food: 'Pizza casera con base integral, pollo y verduras', kcal: '~800 kcal' }
+                ]
+            }
+        ]
+    };
+
+    const renderPlan = (planName) => {
+        const planData = mealPlans[planName];
+        planDetailsContainer.innerHTML = ''; // Clear previous content
+
+        const titleText = planName.charAt(0).toUpperCase() + planName.slice(1).replace('-', ' ');
+        planExampleTitle.textContent = `Menú de Ejemplo (Plan ${titleText})`;
+
+        planData.forEach((day, index) => {
+            const dayIndex = index + 1;
+            
+            const dayContainer = document.createElement('div');
+            
+            const dayTitle = document.createElement('h3');
+            dayTitle.className = 'text-lg font-bold mb-4';
+            dayTitle.textContent = `Día ${dayIndex}`;
+            dayContainer.appendChild(dayTitle);
+
+            const mealsGrid = document.createElement('div');
+            mealsGrid.className = 'grid grid-cols-1 md:grid-cols-3 gap-4';
+
+            day.meals.forEach(meal => {
+                mealsGrid.innerHTML += `
+                    <div class="bg-gray-700/50 p-4 rounded-lg">
+                        <h4 class="font-bold text-white">${meal.name}</h4>
+                        <p class="text-gray-300 text-sm">${meal.food}</p>
+                        <p class="text-gray-400 text-xs mt-2">${meal.kcal}</p>
+                    </div>
+                `;
+            });
+
+            dayContainer.appendChild(mealsGrid);
+            planDetailsContainer.appendChild(dayContainer);
+        });
+    };
+
+    planFilterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Update active button style
+            planFilterBtns.forEach(b => {
+                b.classList.remove('active', 'bg-green-500', 'text-white');
+                b.classList.add('bg-gray-700', 'text-gray-300');
+            });
+            btn.classList.add('active', 'bg-green-500', 'text-white');
+            btn.classList.remove('bg-gray-700', 'text-gray-300');
+
+            // Render the selected plan
+            const planName = btn.dataset.plan;
+            renderPlan(planName);
+        });
+    });
+
+
+    openExampleModalBtn.addEventListener('click', () => {
+        exampleModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        // Render the default plan when opening
+        renderPlan('perder-grasa');
+    });
+
+    const closeExampleModal = () => {
+        exampleModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    };
+
+    closeExampleModalBtn.addEventListener('click', closeExampleModal);
+    exampleModal.addEventListener('click', (e) => {
+        if (e.target === exampleModal) closeExampleModal();
+    });
+
+    downloadPdfBtn.addEventListener('click', () => {
+        const { jsPDF } = window.jspdf;
+        const pdfContent = document.getElementById('plan-pdf-content');
+        
+        // Temporarily change background for capture
+        const originalBg = pdfContent.style.backgroundColor;
+        pdfContent.style.backgroundColor = '#1f2937'; // gray-800
+        
+        html2canvas(pdfContent, {
+            scale: 2, // Improve quality
+            backgroundColor: '#1f2937' // Ensure canvas background matches
+        }).then(canvas => {
+            // Restore original background
+            pdfContent.style.backgroundColor = originalBg;
+            
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save('plan-nutricional-ejemplo.pdf');
+        });
+    });
+
+    // --- Cargar y mostrar reseñas en la sección de testimonios ---
+    function loadReviews() {
+        const reviews = JSON.parse(localStorage.getItem('clientReviews') || '[]');
+        const testimonialsContainer = document.getElementById('testimonials-container');
+        
+        // Si no hay reseñas, mostrar los testimonios predeterminados
+        if (reviews.length === 0) {
+            testimonialsContainer.innerHTML = `
+                <div class="bg-gray-900 p-6 rounded-lg">
+                    <p class="text-gray-300 italic mb-4">"¡Increíble! Nunca pensé que podría lograr tanto en tan poco tiempo. El plan fue duro pero los resultados hablan por sí solos. ¡Totalmente recomendado!"</p>
+                    <div class="flex items-center">
+                        <img src="https://placehold.co/48x48/1f2937/34d399" alt="Foto cliente 1" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <p class="font-bold">Laura Gómez</p>
+                            <p class="text-sm text-green-400">Perdió 10kg en 3 meses</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-lg">
+                    <p class="text-gray-300 italic mb-4">"La planificación online es súper cómoda. [Tu Nombre] está siempre pendiente y adapta los entrenos si es necesario. ¡Un profesional de los pies a la cabeza!"</p>
+                    <div class="flex items-center">
+                        <img src="https://placehold.co/48x48/1f2937/34d399" alt="Foto cliente 2" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <p class="font-bold">Carlos Martín</p>
+                            <p class="text-sm text-green-400">Ganó 5kg de masa muscular</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-lg">
+                    <p class="text-gray-300 italic mb-4">"No solo he mejorado mi físico, sino también mi energía y mi confianza. Aprendí a comer mejor y a disfrutar del proceso. ¡Mil gracias!"</p>
+                    <div class="flex items-center">
+                        <img src="https://placehold.co/48x48/1f2937/34d399" alt="Foto cliente 3" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <p class="font-bold">Sofía Pérez</p>
+                            <p class="text-sm text-green-400">Cambio de estilo de vida</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+        
+        // Limpiar el contenedor
+        testimonialsContainer.innerHTML = '';
+        
+        // Añadir cada reseña
+        reviews.forEach(review => {
+            const reviewElement = document.createElement('div');
+            reviewElement.className = 'bg-gray-900 p-6 rounded-lg';
+            
+            // Generar estrellas según la valoración
+            let stars = '';
+            for (let i = 0; i < 5; i++) {
+                if (i < review.rating) {
+                    stars += '★';
+                } else {
+                    stars += '☆';
+                }
+            }
+            
+            reviewElement.innerHTML = `
+                <p class="text-gray-300 italic mb-4">"${review.review}"</p>
+                <div class="flex items-center">
+                    ${review.photo ? 
+                        `<img src="${review.photo}" alt="Foto de ${review.name}" class="w-12 h-12 rounded-full mr-4 object-cover">` : 
+                        `<img src="https://placehold.co/48x48/1f2937/34d399" alt="Foto de ${review.name}" class="w-12 h-12 rounded-full mr-4">`
+                    }
+                    <div>
+                        <p class="font-bold">${review.name}</p>
+                        <p class="text-sm text-green-400">${stars}</p>
+                    </div>
+                </div>
+            `;
+            
+            testimonialsContainer.appendChild(reviewElement);
+        });
+    }
+
+    // Llamar a la función cuando se cargue la página
+    document.addEventListener('DOMContentLoaded', loadReviews);
+
+</script>
+</body>
+</html>

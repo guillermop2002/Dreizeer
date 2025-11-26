@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Nombre - Entrenador Personal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* Aplicamos la fuente Inter a todo el cuerpo del documento */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Pequeña animación para el botón de WhatsApp */
+        .whatsapp-widget:hover {
+            transform: scale(1.1);
+            transition: transform 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- Widget de WhatsApp -->
+    <a href="https://wa.me/34654310942" target="_blank" rel="noopener noreferrer" class="whatsapp-widget fixed bottom-6 left-6 z-50 bg-green-500 rounded-full p-3 shadow-lg flex items-center justify-center text-white">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.267.655 4.398 1.806 6.151l-1.29 4.723 4.793-1.261z" />
+        </svg>
+    </a>
+
+    <!-- Header y Navegación -->
+    <header class="bg-gray-900/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-40">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-green-400">TU LOGO</a>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#sobre-mi" class="hover:text-green-400 transition-colors">Sobre Mí</a>
+                <a href="#servicios" class="hover:text-green-400 transition-colors">Servicios</a>
+                <a href="#testimonios" class="hover:text-green-400 transition-colors">Testimonios</a>
+                <a href="#contacto" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-md font-semibold transition-colors">Contactar</a>
+            </nav>
+            <button id="mobile-menu-button" class="md:hidden text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </div>
+        <!-- Menú Móvil -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#sobre-mi" class="block py-2 hover:text-green-400">Sobre Mí</a>
+            <a href="#servicios" class="block py-2 hover:text-green-400">Servicios</a>
+            <a href="#testimonios" class="block py-2 hover:text-green-400">Testimonios</a>
+            <a href="#contacto" class="block mt-2 bg-green-500 hover:bg-green-600 px-4 py-2 rounded-md font-semibold text-center">Contactar</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Sección Héroe -->
+        <section class="min-h-screen flex items-center bg-cover bg-center" style="background-image: linear-gradient(rgba(17, 24, 39, 0.8), rgba(17, 24, 39, 0.8)), url('https://placehold.co/1920x1080/111827/34d399?text=IMAGEN+PRINCIPAL');">
+            <!-- Consejo: Usa una imagen tuya de alta calidad en acción, entrenando o motivando -->
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-7xl font-black uppercase tracking-wider">Transforma tu cuerpo, <br><span class="text-green-400">conquista tu mente</span></h1>
+                <p class="mt-4 text-lg md:text-xl max-w-3xl mx-auto text-gray-300">Programas de entrenamiento personalizados para que alcances tus metas de una vez por todas. ¿Empezamos?</p>
+                <a href="#servicios" class="mt-8 inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition-transform duration-300 hover:scale-105">Ver Mis Planes</a>
+            </div>
+        </section>
+
+        <!-- Sección Sobre Mí -->
+        <section id="sobre-mi" class="py-20 bg-gray-800">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="md:w-1/2">
+                         <!-- IMAGEN: Tu foto de perfil profesional, sonriendo y con confianza -->
+                        <img src="https://placehold.co/600x600/1f2937/34d399?text=Tu+Foto+Profesional" alt="Foto del entrenador personal" class="rounded-lg shadow-2xl w-full">
+                    </div>
+                    <div class="md:w-1/2">
+                        <h2 class="text-3xl font-bold mb-4">Hola, soy <span class="text-green-400">[Tu Nombre]</span></h2>
+                        <p class="text-gray-300 mb-4">
+                            Apasionado del fitness y el bienestar con más de [X] años de experiencia ayudando a personas como tú a superar sus límites. Mi misión no es solo que consigas el físico que deseas, sino que adquieras hábitos saludables que te acompañen toda la vida.
+                        </p>
+                        <p class="text-gray-300 mb-6">
+                            Creo en un enfoque integral que combina entrenamiento efectivo, nutrición inteligente y la mentalidad correcta para garantizar resultados reales y sostenibles.
+                        </p>
+                        <a href="#contacto" class="bg-transparent border-2 border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 font-semibold py-2 px-6 rounded-lg transition-colors">Hablemos</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección Servicios -->
+        <section id="servicios" class="py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold mb-2">Mis Servicios</h2>
+                <p class="text-gray-400 mb-12 max-w-2xl mx-auto">Planes diseñados para adaptarse a tus necesidades, tu estilo de vida y tus objetivos.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Tarjeta de Servicio 1 -->
+                    <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-left transform hover:-translate-y-2 transition-transform duration-300">
+                        <!-- IMAGEN: Icono o imagen representativa (ej. una mancuerna) -->
+                        <div class="bg-green-500/10 text-green-400 rounded-lg w-16 h-16 flex items-center justify-center mb-6">
+                            <!-- Placeholder para icono -->
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-5.747-5.747h11.494"></path><path d="M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3">Entrenamiento Personal 1-a-1</h3>
+                        <p class="text-gray-400">Atención exclusiva y un plan 100% adaptado a ti. Maximiza tus resultados con mi supervisión directa en cada sesión.</p>
+                    </div>
+                    <!-- Tarjeta de Servicio 2 -->
+                    <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-left transform hover:-translate-y-2 transition-transform duration-300">
+                        <!-- IMAGEN: Icono o imagen representativa (ej. un ordenador) -->
+                         <div class="bg-green-500/10 text-green-400 rounded-lg w-16 h-16 flex items-center justify-center mb-6">
+                            <!-- Placeholder para icono -->
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3">Asesoramiento Online</h3>
+                        <p class="text-gray-400">Entrena donde y cuando quieras. Recibirás tu planificación a través de una app y tendremos seguimiento semanal para ajustar tu progreso.</p>
+                    </div>
+                    <!-- Tarjeta de Servicio 3 -->
+                    <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-left transform hover:-translate-y-2 transition-transform duration-300">
+                        <!-- IMAGEN: Icono o imagen representativa (ej. una manzana) -->
+                        <div class="bg-green-500/10 text-green-400 rounded-lg w-16 h-16 flex items-center justify-center mb-6">
+                            <!-- Placeholder para icono -->
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3">Planes de Nutrición</h3>
+                        <p class="text-gray-400">La alimentación es clave. Te ayudaré a crear un plan nutricional equilibrado y delicioso que potencie tus resultados en el gimnasio.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección Testimonios -->
+        <section id="testimonios" class="py-20 bg-gray-800">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12">Lo que dicen mis clientes</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Testimonio 1 -->
+                    <div class="bg-gray-900 p-6 rounded-lg">
+                        <p class="text-gray-300 italic mb-4">"¡Increíble! Nunca pensé que podría lograr tanto en tan poco tiempo. El plan fue duro pero los resultados hablan por sí solos. ¡Totalmente recomendado!"</p>
+                        <div class="flex items-center">
+                             <!-- IMAGEN: Foto del cliente (con su permiso) -->
+                            <img src="https://placehold.co/48x48/1f2937/34d399?text=C1" alt="Foto cliente 1" class="w-12 h-12 rounded-full mr-4">
+                            <div>
+                                <p class="font-bold">Laura Gómez</p>
+                                <p class="text-sm text-green-400">Perdió 10kg en 3 meses</p>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- Testimonio 2 -->
+                     <div class="bg-gray-900 p-6 rounded-lg">
+                        <p class="text-gray-300 italic mb-4">"La planificación online es súper cómoda. [Tu Nombre] está siempre pendiente y adapta los entrenos si es necesario. ¡Un profesional de los pies a la cabeza!"</p>
+                        <div class="flex items-center">
+                             <!-- IMAGEN: Foto del cliente (con su permiso) -->
+                            <img src="https://placehold.co/48x48/1f2937/34d399?text=C2" alt="Foto cliente 2" class="w-12 h-12 rounded-full mr-4">
+                            <div>
+                                <p class="font-bold">Carlos Martín</p>
+                                <p class="text-sm text-green-400">Ganó 5kg de masa muscular</p>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- Testimonio 3 -->
+                     <div class="bg-gray-900 p-6 rounded-lg">
+                        <p class="text-gray-300 italic mb-4">"No solo he mejorado mi físico, sino también mi energía y mi confianza. Aprendí a comer mejor y a disfrutar del proceso. ¡Mil gracias!"</p>
+                        <div class="flex items-center">
+                             <!-- IMAGEN: Foto del cliente (con su permiso) -->
+                            <img src="https://placehold.co/48x48/1f2937/34d399?text=C3" alt="Foto cliente 3" class="w-12 h-12 rounded-full mr-4">
+                            <div>
+                                <p class="font-bold">Sofía Pérez</p>
+                                <p class="text-sm text-green-400">Cambio de estilo de vida</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="contacto" class="bg-gray-900 py-16">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold mb-4">¿Listo para empezar tu cambio?</h2>
+            <p class="text-gray-400 mb-8 max-w-xl mx-auto">Envíame un mensaje y agenda una primera sesión de valoración gratuita y sin compromiso.</p>
+            <a href="https://wa.me/34654310942" target="_blank" rel="noopener noreferrer" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition-transform duration-300 hover:scale-105 inline-block">¡Contactar ahora!</a>
+            <div class="mt-12 flex justify-center space-x-6">
+                <!-- Cambia '#' por los enlaces a tus redes sociales -->
+                <a href="#" class="text-gray-400 hover:text-green-400"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069-4.85c.149-3.225 1.664-4.771 4.919-4.919 1.266-.057 1.644-.069 4.85-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.359 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.947s-.014-3.667-.072-4.947c-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.689-.073-4.948-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4s1.791-4 4-4 4 1.79 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44 1.441-.645 1.441-1.44c0-.795-.645-1.44-1.441-1.44z"/></svg></a>
+                <a href="#" class="text-gray-400 hover:text-green-400"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616v.064c0 2.299 1.634 4.218 3.803 4.654-.709.192-1.448.22-2.168.087.606 1.885 2.365 3.262 4.453 3.303-1.791 1.403-4.049 2.24-6.495 2.24-.42 0-.835-.025-1.243-.073 2.305 1.476 5.048 2.34 8.04 2.34 9.638 0 14.921-7.98 14.557-14.557 1.021-.735 1.898-1.658 2.592-2.69z"/></svg></a>
+            </div>
+            <div class="mt-12 text-gray-500 text-sm">
+                &copy; <span id="year"></span> Tu Nombre | Entrenador Personal. Todos los derechos reservados.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Script para el menú móvil
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Script para el año del footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

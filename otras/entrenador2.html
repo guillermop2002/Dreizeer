@@ -1,0 +1,3044 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Nombre - Entrenador Personal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <!-- Google Maps API - RECUERDA REEMPLAZAR 'YOUR_GOOGLE_MAPS_API_KEY' con tu clave de API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap" async defer></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .whatsapp-widget:hover { transform: scale(1.1); transition: transform 0.2s ease-in-out; }
+        .modal { transition: opacity 0.3s ease; }
+        .modal-content { transition: transform 0.3s ease; }
+        .schedule-slot:not(.disabled):hover { background-color: #34d399; color: #111827; }
+        .btn-primary { 
+            height: 48px; 
+            border-radius: 14px; 
+            padding: 0 20px; 
+            gap: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .btn-primary:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .btn-primary:active { 
+            transform: scale(0.97);
+        }
+        .btn-loading {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-loading::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #34d399, transparent);
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background-color: rgba(52, 211, 153, 0.1);
+            color: #34d399;
+            margin-left: 8px;
+        }
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            background: #1f2937;
+            z-index: 60;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+        }
+        .drawer.open {
+            right: 0;
+        }
+        .wizard-step {
+            display: none;
+        }
+        .wizard-step.active {
+            display: block;
+        }
+        .progress-bar {
+            height: 4px;
+            background-color: #374151;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #34d399;
+            transition: width 0.3s ease;
+        }
+        .flip-card {
+            perspective: 1000px;
+            height: 200px;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+            background-color: #374151;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast.success {
+            background-color: #10b981;
+        }
+        .toast.error {
+            background-color: #ef4444;
+        }
+        .skeleton {
+            background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+            background-size: 200% 100%;
+            animation: loading-skeleton 1.5s infinite;
+            border-radius: 4px;
+        }
+        @keyframes loading-skeleton {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .price-ticker {
+            transition: all 0.3s ease;
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f59e0b;
+            opacity: 0;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- Widget de WhatsApp -->
+    <a href="https://wa.me/34654310942" target="_blank" rel="noopener noreferrer" class="whatsapp-widget fixed bottom-6 left-6 z-50 bg-green-500 rounded-full p-3 shadow-lg flex items-center justify-center text-white">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.267.655 4.398 1.806 6.151l-1.29 4.723 4.793-1.261z" /></svg>
+    </a>
+
+    <!-- Header y Navegación -->
+    <header class="bg-gray-900/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-40">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-green-400">TU LOGO</a>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#sobre-mi" class="hover:text-green-400 transition-colors">Sobre Mí</a>
+                <a href="#servicios" class="hover:text-green-400 transition-colors">Servicios</a>
+                <a href="#testimonios" class="hover:text-green-400 transition-colors">Testimonios</a>
+                <a href="#contacto" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-md font-semibold transition-colors">Contactar</a>
+            </nav>
+            <button id="mobile-menu-button" class="md:hidden text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#sobre-mi" class="block py-2 hover:text-green-400">Sobre Mí</a>
+            <a href="#servicios" class="block py-2 hover:text-green-400">Servicios</a>
+            <a href="#testimonios" class="block py-2 hover:text-green-400">Testimonios</a>
+            <a href="#contacto" class="block mt-2 bg-green-500 hover:bg-green-600 px-4 py-2 rounded-md font-semibold text-center">Contactar</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Sección Héroe -->
+        <section class="min-h-screen flex items-center bg-cover bg-center" style="background-image: linear-gradient(rgba(17, 24, 39, 0.8), rgba(17, 24, 39, 0.8)), url('https://placehold.co/1920x1080/111827/34d399?text=IMAGEN+PRINCIPAL');">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-7xl font-black uppercase tracking-wider">Transforma tu cuerpo, <br><span class="text-green-400">conquista tu mente</span></h1>
+                <p class="mt-4 text-lg md:text-xl max-w-3xl mx-auto text-gray-300">Programas de entrenamiento personalizados para que alcances tus metas de una vez por todas. ¿Empezamos?</p>
+                <a href="#servicios" class="mt-8 inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition-transform duration-300 hover:scale-105">Ver Mis Planes</a>
+            </div>
+        </section>
+
+        <!-- Sección Sobre Mí -->
+        <section id="sobre-mi" class="py-20 bg-gray-800">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="md:w-1/2">
+                        <img src="https://placehold.co/600x600/1f2937/34d399?text=Tu+Foto+Profesional" alt="Foto del entrenador personal" class="rounded-lg shadow-2xl w-full">
+                    </div>
+                    <div class="md:w-1/2">
+                        <h2 class="text-3xl font-bold mb-4">Hola, soy <span class="text-green-400">[Tu Nombre]</span></h2>
+                        <p class="text-gray-300 mb-4">Apasionado del fitness y el bienestar con más de [X] años de experiencia ayudando a personas como tú a superar sus límites. Mi misión no es solo que consigas el físico que deseas, sino que adquieras hábitos saludables que te acompañen toda la vida.</p>
+                        <p class="text-gray-300 mb-6">Creo en un enfoque integral que combina entrenamiento efectivo, nutrición inteligente y la mentalidad correcta para garantizar resultados reales y sostenibles.</p>
+                        <a href="#contacto" class="bg-transparent border-2 border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 font-semibold py-2 px-6 rounded-lg transition-colors">Hablemos</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Sección Características Clave -->
+        <section id="metodologia" class="py-20 bg-gray-900">
+             <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold mb-2">¿Por qué entrenar conmigo?</h2>
+                <p class="text-gray-400 mb-12 max-w-2xl mx-auto">Mi método se centra en la personalización, la flexibilidad y los resultados reales.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left">
+                    <div class="bg-gray-800 p-6 rounded-lg"><div class="bg-green-500/10 text-green-400 rounded-lg w-12 h-12 flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg></div><h3 class="font-bold text-lg mb-2">Adaptado a ti</h3><p class="text-gray-400 text-sm">Los entrenamientos se diseñan para tu condición física, objetivos y cualquier patología existente.</p></div>
+                    <div class="bg-gray-800 p-6 rounded-lg"><div class="bg-green-500/10 text-green-400 rounded-lg w-12 h-12 flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg></div><h3 class="font-bold text-lg mb-2">Donde tú elijas</h3><p class="text-gray-400 text-sm">Entrenamientos a domicilio, en tu gimnasio comunitario o al aire libre para tu máxima comodidad.</p></div>
+                    <div class="bg-gray-800 p-6 rounded-lg"><div class="bg-green-500/10 text-green-400 rounded-lg w-12 h-12 flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg></div><h3 class="font-bold text-lg mb-2">Opción para Grupos</h3><p class="text-gray-400 text-sm">El entrenamiento personal puede ser para grupos reducidos de hasta 3 personas por el mismo costo.</p></div>
+                    <div class="bg-gray-800 p-6 rounded-lg"><div class="bg-green-500/10 text-green-400 rounded-lg w-12 h-12 flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg></div><h3 class="font-bold text-lg mb-2">Mejora tu Condición</h3><p class="text-gray-400 text-sm">Entrenamiento personal dirigido a mejorar tu condición física general, fuerza y resistencia.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección Servicios -->
+        <section id="servicios" class="py-20 bg-gray-800">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold mb-2">Mis Servicios</h2>
+                <p class="text-gray-400 mb-12 max-w-2xl mx-auto">Acciones rápidas para empezar tu transformación. Elige una opción y da el primer paso.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Tarjeta de Servicio: Entrenamiento Personal -->
+                    <div class="bg-gray-900 p-8 rounded-lg shadow-lg text-left flex flex-col">
+                        <h3 class="text-2xl font-bold mb-4">Entrenamiento Personal</h3>
+                        <div class="space-y-3">
+                            <button data-modal-target="reservar-sesion" class="w-full btn-primary bg-green-500 hover:bg-green-600 text-white font-semibold">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                Reservar ahora
+                                <span class="chip" id="next-slot-chip">Próximo: 10:00</span>
+                            </button>
+                            <button id="open-availability-drawer" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-500/10 transition-colors text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span class="font-semibold">Ver agenda</span>
+                            </button>
+                            <button data-modal-target="entrena-grupo" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-500/10 transition-colors text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <span class="font-semibold">Armar grupo</span>
+                                <span class="chip">Desde 15€/pers</span>
+                            </button>
+                            <button data-modal-target="sesion-prueba" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-500/10 transition-colors text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H7a2 2 0 01-2-2V5zM5 14a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H7a2 2 0 01-2-2v-3z" />
+                                </svg>
+                                <span class="font-semibold">Probar por 9,99€</span>
+                                <span class="chip">-60%</span>
+                            </button>
+                            <button data-modal-target="entreno-domicilio" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-500/10 transition-colors text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span class="font-semibold">¿Llego a tu zona?</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Tarjeta de Servicio: Asesoramiento Online -->
+                    <div class="bg-gray-900 p-8 rounded-lg shadow-lg text-left flex flex-col">
+                        <h3 class="text-2xl font-bold mb-4">Asesoramiento Online</h3>
+                        <div class="space-y-3">
+                            <button data-modal-target="evaluacion-inicial" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-500/10 transition-colors text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                </svg>
+                                <span class="font-semibold">Hacer evaluación</span>
+                                <span class="chip">Te doy un plan base</span>
+                            </button>
+                            <button data-modal-target="probar-app" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-500/10 transition-colors text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span class="font-semibold">Probar demo</span>
+                            </button>
+                            <button data-modal-target="enviar-video" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-500/10 transition-colors text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                <span class="font-semibold">Subir mi vídeo</span>
+                                <span class="chip">Feedback en 24-48 h</span>
+                            </button>
+                            <a href="https://wa.me/34654310942?text=Hola%2C%20quisiera%20saber%20m%C3%A1s%20sobre%20el%20asesoramiento%20online." target="_blank" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-500/10 transition-colors text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                                <span class="font-semibold">Hablar por WhatsApp</span>
+                                <span class="chip online-status" id="online-status">Estoy online</span>
+                            </a>
+                            <button data-modal-target="ver-planes" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-500/10 transition-colors text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span class="font-semibold">Comparar planes</span>
+                                <span class="chip">Mensual / Trimestral</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta de Servicio: Planes de Nutrición -->
+                    <div class="bg-gray-900 p-8 rounded-lg shadow-lg text-left flex flex-col">
+                        <h3 class="text-2xl font-bold mb-4">Planes de Nutrición</h3>
+                       <div class="space-y-3">
+                            <button data-modal-target="calcular-macros" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-500/10 transition-colors text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                </svg>
+                                <span class="font-semibold">Calcular macros</span>
+                            </button>
+                            <button data-modal-target="ver-menu" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-500/10 transition-colors text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span class="font-semibold">Ver ejemplo 3 días</span>
+                                <span class="chip">Incluye lista de compra</span>
+                            </button>
+                            <button data-modal-target="preferencias" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-500/10 transition-colors text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span class="font-semibold">Personalizar gustos</span>
+                            </button>
+                            <button data-modal-target="lista-compra" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-500/10 transition-colors text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <span class="font-semibold">Crear lista semanal</span>
+                                <span class="chip">Enviar a WhatsApp/email</span>
+                            </button>
+                            <button data-modal-target="suscripcion-nutricion" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-500/10 transition-colors text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                <span class="font-semibold">Suscribirme</span>
+                                <span class="chip">Pausa cuando quieras</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección Testimonios -->
+        <section id="testimonios" class="py-20 bg-gray-900">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12">Lo que dicen mis clientes</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-gray-800 p-6 rounded-lg"><p class="text-gray-300 italic mb-4">"¡Increíble! Nunca pensé que podría lograr tanto en tan poco tiempo. El plan fue duro pero los resultados hablan por sí solos. ¡Totalmente recomendado!"</p><div class="flex items-center"><img src="https://placehold.co/48x48/1f2937/34d399?text=C1" alt="Foto cliente 1" class="w-12 h-12 rounded-full mr-4"><div><p class="font-bold">Laura Gómez</p><p class="text-sm text-green-400">Perdió 10kg en 3 meses</p></div></div></div>
+                    <div class="bg-gray-800 p-6 rounded-lg"><p class="text-gray-300 italic mb-4">"La planificación online es súper cómoda. [Tu Nombre] está siempre pendiente y adapta los entrenos si es necesario. ¡Un profesional de los pies a la cabeza!"</p><div class="flex items-center"><img src="https://placehold.co/48x48/1f2937/34d399?text=C2" alt="Foto cliente 2" class="w-12 h-12 rounded-full mr-4"><div><p class="font-bold">Carlos Martín</p><p class="text-sm text-green-400">Ganó 5kg de masa muscular</p></div></div></div>
+                    <div class="bg-gray-800 p-6 rounded-lg"><p class="text-gray-300 italic mb-4">"No solo he mejorado mi físico, sino también mi energía y mi confianza. Aprendí a comer mejor y a disfrutar del proceso. ¡Mil gracias!"</p><div class="flex items-center"><img src="https://placehold.co/48x48/1f2937/34d399?text=C3" alt="Foto cliente 3" class="w-12 h-12 rounded-full mr-4"><div><p class="font-bold">Sofía Pérez</p><p class="text-sm text-green-400">Cambio de estilo de vida</p></div></div></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="contacto" class="bg-gray-800 py-16">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold mb-4">¿Listo para empezar tu cambio?</h2>
+            <p class="text-gray-400 mb-8 max-w-xl mx-auto">Envíame un mensaje para resolver cualquier duda o agendar una primera sesión de valoración gratuita y sin compromiso.</p>
+            <a href="https://wa.me/34654310942" target="_blank" rel="noopener noreferrer" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition-transform duration-300 hover:scale-105 inline-block">¡Contactar ahora por WhatsApp!</a>
+            <div class="mt-12 flex justify-center space-x-6">
+                <a href="#" class="text-gray-400 hover:text-green-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-0.058-1.265-0.069-1.645-0.069-4.85s0.011-3.584 0.069-4.85c0.149-3.225 1.664-4.771 4.919-4.919 1.266-0.057 1.644-0.069 4.85-0.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-0.059 1.281-0.073 1.689-0.073 4.948s0.014 3.667 0.072 4.947c0.2 4.359 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-0.014 4.947-0.072c4.354-0.2 6.782-2.618 6.979-6.98 0.059-1.28 0.073-1.689 0.073-4.947s-0.014-3.667-0.072-4.947c-0.196-4.354-2.617-6.78-6.979-6.98-1.281-0.059-1.689-0.073-4.948-0.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4s1.791-4 4-4 4 1.79 4 4-1.791 4-4 4zm6.406-11.845c-0.796 0-1.441 0.645-1.441 1.44s0.645 1.44 1.441 1.44 1.441-0.645 1.441-1.44c0-0.795-0.645-1.44-1.441-1.44z"/></svg></a>
+                <a href="#" class="text-gray-400 hover:text-green-400"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616v.064c0 2.299 1.634 4.218 3.803 4.654-.709.192-1.448.22-2.168.087.606 1.885 2.365 3.262 4.453 3.303-1.791 1.403-4.049 2.24-6.495 2.24-.42 0-.835-.025-1.243-.073 2.305 1.476 5.048 2.34 8.04 2.34 9.638 0 14.921-7.98 14.557-14.557 1.021-.735 1.898-1.658 2.592-2.69z"/></svg></a>
+            </div>
+            <div class="mt-12 text-gray-500 text-sm">
+                &copy; <span id="year"></span> Tu Nombre | Entrenador Personal. Todos los derechos reservados.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Drawer para disponibilidad -->
+    <div id="availability-drawer" class="drawer">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-green-400">Mi Disponibilidad</h3>
+                <button id="close-availability-drawer" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="mb-4 flex space-x-2">
+                <button class="filter-btn active px-3 py-1 rounded-full bg-green-500 text-white text-sm">Todos</button>
+                <button class="filter-btn px-3 py-1 rounded-full bg-gray-700 text-gray-300 text-sm">Mañana</button>
+                <button class="filter-btn px-3 py-1 rounded-full bg-gray-700 text-gray-300 text-sm">Tarde</button>
+                <button class="filter-btn px-3 py-1 rounded-full bg-gray-700 text-gray-300 text-sm">Finde</button>
+            </div>
+            <div id="availability-slots" class="space-y-4">
+                <!-- Los slots se cargarán aquí dinámicamente -->
+                <div class="skeleton h-12"></div>
+                <div class="skeleton h-12"></div>
+                <div class="skeleton h-12"></div>
+            </div>
+            <button id="view-more-slots" class="w-full mt-6 py-2 border border-green-400 text-green-400 rounded-lg hover:bg-green-400 hover:text-gray-900 transition-colors">
+                Ver más horarios
+            </button>
+        </div>
+    </div>
+
+    <!-- Contenedor del Modal -->
+    <div id="main-modal" class="modal fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4 hidden opacity-0">
+        <div id="modal-content-wrapper" class="modal-content bg-gray-800 rounded-lg shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 relative transform scale-95">
+            <button id="modal-close-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div id="modal-body">
+                <!-- El contenido dinámico se insertará aquí -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast notifications -->
+    <div id="toast-container"></div>
+    
+    <!-- Plantillas para el contenido de los modales (ocultas) -->
+    <div id="modal-templates" class="hidden">
+        <!-- Template para Reservar Sesión (Wizard de 5 pasos) -->
+        <div id="reservar-sesion-content">
+            <div class="progress-bar">
+                <div id="reservation-progress" class="progress-fill" style="width: 20%"></div>
+            </div>
+            
+            <div id="step-1" class="wizard-step active">
+                <h3 class="text-2xl font-bold mb-4 text-green-400">Reserva tu Sesión</h3>
+                <p class="mb-4 text-gray-400">Elige el tipo de servicio que mejor se adapte a tus necesidades.</p>
+                
+                <form id="service-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Modalidad</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center p-3 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700">
+                                <input type="radio" name="modality" value="1a1" class="mr-2 text-green-500" checked>
+                                <span>1-a-1</span>
+                            </label>
+                            <label class="flex items-center p-3 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700">
+                                <input type="radio" name="modality" value="group" class="mr-2 text-green-500">
+                                <span>Grupo</span>
+                            </label>
+                            <label class="flex items-center p-3 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700">
+                                <input type="radio" name="modality" value="online" class="mr-2 text-green-500">
+                                <span>Online</span>
+                            </label>
+                            <label class="flex items-center p-3 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700">
+                                <input type="radio" name="modality" value="home" class="mr-2 text-green-500">
+                                <span>A domicilio</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Duración</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center p-3 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700">
+                                <input type="radio" name="duration" value="60" class="mr-2 text-green-500" checked>
+                                <span>60 min</span>
+                            </label>
+                            <label class="flex items-center p-3 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700">
+                                <input type="radio" name="duration" value="90" class="mr-2 text-green-500">
+                                <span>90 min</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Nivel</label>
+                        <select name="level" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 text-white focus:ring-green-500 focus:border-green-500">
+                            <option value="beginner">Principiante</option>
+                            <option value="intermediate" selected>Intermedio</option>
+                            <option value="advanced">Avanzado</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Objetivo principal</label>
+                        <select name="goal" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 text-white focus:ring-green-500 focus:border-green-500">
+                            <option value="weight-loss">Pérdida de peso</option>
+                            <option value="muscle-gain" selected>Ganar masa muscular</option>
+                            <option value="endurance">Mejorar resistencia</option>
+                            <option value="rehabilitation">Rehabilitación</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex justify-between mt-6">
+                        <button type="button" class="px-4 py-2 text-gray-300 hover:text-white">Cancelar</button>
+                        <button type="button" id="next-to-step-2" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Siguiente</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div id="step-2" class="wizard-step">
+                <h3 class="text-2xl font-bold mb-4 text-green-400">Elige fecha y hora</h3>
+                <p class="mb-4 text-gray-400">Selecciona un horario que se ajuste a tu disponibilidad.</p>
+                
+                <div id="schedule-container" class="mb-4"></div>
+                
+                <div class="flex justify-between mt-6">
+                    <button type="button" id="back-to-step-1" class="px-4 py-2 text-gray-300 hover:text-white">Atrás</button>
+                    <button type="button" id="next-to-step-3" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Siguiente</button>
+                </div>
+            </div>
+            
+            <div id="step-3" class="wizard-step">
+                <h3 class="text-2xl font-bold mb-4 text-green-400">Tus datos</h3>
+                <p class="mb-4 text-gray-400">Completa tus datos para proceder con la reserva.</p>
+                
+                <form id="user-data-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Nombre completo</label>
+                        <input type="text" name="name" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Email</label>
+                        <input type="email" name="email" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Teléfono/WhatsApp</label>
+                        <input type="tel" name="phone" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">¿Tienes alguna lesión o condición médica?</label>
+                        <textarea name="injuries" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" id="terms" name="terms" class="mr-2 text-green-500" required>
+                        <label for="terms" class="text-sm text-gray-300">Acepto los <a href="#" class="text-green-400 hover:underline">términos y condiciones</a> y la política de cancelación (sin coste hasta 24h antes)</label>
+                    </div>
+                </form>
+                
+                <div class="flex justify-between mt-6">
+                    <button type="button" id="back-to-step-2" class="px-4 py-2 text-gray-300 hover:text-white">Atrás</button>
+                    <button type="button" id="next-to-step-4" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Siguiente</button>
+                </div>
+            </div>
+            
+            <div id="step-4" class="wizard-step">
+                <h3 class="text-2xl font-bold mb-4 text-green-400">Pago</h3>
+                <p class="mb-4 text-gray-400">Realiza el pago de la señal (20%) para confirmar tu reserva.</p>
+                
+                <div class="bg-gray-700 p-4 rounded-lg mb-4">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-300">Sesión de entrenamiento</span>
+                        <span class="text-white">40€</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-300">Señal (20%)</span>
+                        <span class="text-white">8€</span>
+                    </div>
+                    <div class="flex justify-between font-bold border-t border-gray-600 pt-2 mt-2">
+                        <span class="text-gray-300">Total a pagar ahora</span>
+                        <span class="text-green-400">8€</span>
+                    </div>
+                </div>
+                
+                <div id="payment-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Número de tarjeta</label>
+                        <input type="text" placeholder="1234 5678 9012 3456" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300">Fecha de expiración</label>
+                            <input type="text" placeholder="MM/AA" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300">CVV</label>
+                            <input type="text" placeholder="123" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Cupón (opcional)</label>
+                        <input type="text" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500">
+                    </div>
+                    
+                    <button type="button" id="process-payment" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg btn-loading">Pagar 8€</button>
+                    
+                    <div class="text-center mt-4">
+                        <button type="button" class="text-green-400 hover:text-green-300">¿Prefieres pagar con PayPal?</button>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between mt-6">
+                    <button type="button" id="back-to-step-3" class="px-4 py-2 text-gray-300 hover:text-white">Atrás</button>
+                </div>
+            </div>
+            
+            <div id="step-5" class="wizard-step">
+                <h3 class="text-2xl font-bold mb-4 text-green-400 text-center">¡Reserva confirmada!</h3>
+                <div class="text-center mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-green-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p class="text-gray-300 mb-2">Tu sesión ha sido reservada con éxito.</p>
+                    <p class="text-gray-300 mb-4">Te hemos enviado un email de confirmación con todos los detalles.</p>
+                </div>
+                
+                <div class="bg-gray-700 p-4 rounded-lg mb-4">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-300">Fecha y hora</span>
+                        <span class="text-white" id="confirmed-date-time">Viernes 15, 10:00</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-300">Tipo</span>
+                        <span class="text-white" id="confirmed-type">Entrenamiento 1-a-1</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-300">Duración</span>
+                        <span class="text-white" id="confirmed-duration">60 min</span>
+                    </div>
+                    <div class="flex justify-between font-bold border-t border-gray-600 pt-2 mt-2">
+                        <span class="text-gray-300">Total</span>
+                        <span class="text-green-400" id="confirmed-total">40€</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <button type="button" id="add-to-calendar" class="bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 font-semibold py-2 px-4 rounded-lg transition-colors">
+                        Añadir al calendario
+                    </button>
+                    <a href="https://wa.me/34654310942?text=Hola%2C%20acabo%20de%20reservar%20una%20sesión%20contigo%20y%20tengo%20algunas%20preguntas." target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg text-center">
+                        Escribir por WhatsApp
+                    </a>
+                </div>
+                
+                <div class="text-center mt-6">
+                    <button type="button" id="close-reservation" class="text-green-400 hover:text-green-300">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template para Entrenar en Grupo -->
+        <div id="entrena-grupo-content">
+            <h3 class="text-2xl font-bold mb-4 text-green-400">Entrenamiento en Grupo</h3>
+            <p class="mb-4 text-gray-400">Organiza un grupo de hasta 3 personas y aprovecha precios reducidos.</p>
+            
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Número de personas</label>
+                <div class="flex items-center justify-between bg-gray-700 rounded-lg p-2">
+                    <button id="decrease-group" class="w-10 h-10 rounded-full bg-gray-600 text-white flex items-center justify-center">-</button>
+                    <span id="group-size" class="text-2xl font-bold">2</span>
+                    <button id="increase-group" class="w-10 h-10 rounded-full bg-gray-600 text-white flex items-center justify-center">+</button>
+                </div>
+            </div>
+            
+            <div class="bg-gray-700 p-4 rounded-lg mb-4">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-300">Precio por persona</span>
+                    <span id="price-per-person" class="text-white price-ticker">15€</span>
+                </div>
+                <div class="flex justify-between font-bold border-t border-gray-600 pt-2 mt-2">
+                    <span class="text-gray-300">Total</span>
+                    <span id="group-total" class="text-green-400 price-ticker">30€</span>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Horarios compatibles</label>
+                <div id="group-schedule" class="space-y-2">
+                    <!-- Los horarios compatibles se cargarán aquí -->
+                    <div class="skeleton h-8"></div>
+                    <div class="skeleton h-8"></div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <button id="create-whatsapp-group" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.267.655 4.398 1.806 6.151l-1.29 4.723 4.793-1.261z"/>
+                    </svg>
+                    Crear grupo WhatsApp
+                </button>
+                <button id="split-payment" class="bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 font-semibold py-2 px-4 rounded-lg transition-colors">
+                    Pago dividido
+                </button>
+            </div>
+            
+            <form class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300">Tu Nombre</label>
+                    <input type="text" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300">Tu Email</label>
+                    <input type="email" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300">Nombres de los otros integrantes (opcional)</label>
+                    <textarea class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Enviar Solicitud</button>
+            </form>
+        </div>
+
+        <!-- Template para Sesión de Prueba -->
+        <div id="sesion-prueba-content">
+            <h3 class="text-2xl font-bold mb-4 text-green-400">Sesión de Prueba con Descuento</h3>
+            <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-4">
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-yellow-500 font-semibold" id="countdown-timer">Termina en 15:00</span>
+                </div>
+            </div>
+             
+            <p class="mb-4 text-gray-400">Aprovecha una primera sesión a un precio especial de <strong>9,99€</strong> (normalmente 25€). ¡El primer paso hacia tu cambio!</p>
+            
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Próximos horarios disponibles</label>
+                <div id="trial-slots" class="space-y-2">
+                    <!-- Los slots de prueba se cargarán aquí -->
+                    <div class="skeleton h-8"></div>
+                    <div class="skeleton h-8"></div>
+                </div>
+            </div>
+            
+            <button class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg btn-loading mb-4">Pagar 9,99€</button>
+            
+            <div class="text-center">
+                <p class="text-gray-400 text-sm">Garantía: "Si no te convence, te devolvemos la prueba."</p>
+            </div>
+            
+            <div class="mt-6 p-4 bg-gray-700 rounded-lg">
+                <h4 class="font-bold text-lg mb-2">¿Te ha gustado? Continúa con un pack</h4>
+                <p class="text-gray-400 text-sm mb-3">Pack de 4 sesiones con un 15% de descuento</p>
+                <button class="w-full bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 font-semibold py-2 px-4 rounded-lg transition-colors">
+                    Ver pack de 4 sesiones
+                </button>
+            </div>
+        </div>
+
+        <!-- Template para Entreno a Domicilio -->
+        <div id="entreno-domicilio-content">
+            <h3 class="text-2xl font-bold mb-4 text-green-400">Entrenamiento a Domicilio/Box</h3>
+            <p class="mb-4 text-gray-400">Introduce tu dirección para verificar la cobertura. Se podría aplicar un recargo por desplazamiento fuera de la zona céntrica.</p>
+            
+            <div class="flex gap-2 mb-4">
+                <input id="address-input" type="text" placeholder="Ej: Calle Gran Vía, 28013 Madrid" class="flex-grow bg-gray-700 border border-gray-600 rounded-md p-2 text-white focus:ring-green-500 focus:border-green-500">
+                <button id="detect-location" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
+            </div>
+            
+            <button id="show-map-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg mb-4">Verificar dirección</button>
+            
+            <div id="coverage-result" class="hidden p-4 rounded-lg mb-4">
+                <!-- Resultado de cobertura se mostrará aquí -->
+            </div>
+            
+            <div id="map" class="mt-4 h-64 w-full bg-gray-700 rounded-md hidden"></div>
+            
+            <div class="mt-4">
+                <button id="send-address-whatsapp" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.267.655 4.398 1.806 6.151l-1.29 4.723 4.793-1.261z"/>
+                    </svg>
+                    Enviar dirección por WhatsApp
+                </button>
+            </div>
+        </div>
+
+        <!-- Template para Evaluación Inicial -->
+        <div id="evaluacion-inicial-content">
+            <h3 class="text-2xl font-bold mb-4 text-green-400">Evaluación Inicial</h3>
+            <p class="mb-4 text-gray-400">Completa este breve quiz para entender mejor tus objetivos y crear un plan personalizado.</p>
+            
+            <div class="progress-bar mb-6">
+                <div id="assessment-progress" class="progress-fill" style="width: 12.5%"></div>
+            </div>
+            
+            <form id="assessment-form" class="space-y-6">
+                <div id="assessment-step-1" class="assessment-step active">
+                    <h4 class="font-bold text-lg mb-3">Paso 1 de 8: ¿Cuál es tu objetivo principal?</h4>
+                    <div class="space-y-3">
+                        <label class="flex items-center p-3 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700">
+                            <input type="radio" name="goal" value="weight-loss" class="mr-3 text-green-500">
+                            <div>
+                                <div class="font-medium">Perder peso</div>
+                                <div class="text-sm text-gray-400">Reducir grasa corporal y tonificar</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center p-3 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700">
+                            <input type="radio" name="goal" value="muscle-gain" class="mr-3 text-green-500">
+                            <div>
+                                <div class="font-medium">Ganar músculo</div>
+                                <div class="text-sm text-gray-400">Aumentar masa muscular y fuerza</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center p-3 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700">
+                            <input type="radio" name="goal" value="endurance" class="mr-3 text-green-500">
+                            <div>
+                                <div class="font-medium">Mejorar resistencia</div>
+                                <div class="text-sm text-gray-400">Aumentar capacidad cardiovascular</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center p-3 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700">
+                            <input type="radio" name="goal" value="health" class="mr-3 text-green-500">
+                            <div>
+                                <div class="font-medium">Salud general</div>
+                                <div class="text-sm text-gray-400">Mejorar bienestar y calidad de vida</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="flex justify-end mt-4">
+                        <button type="button" class="assessment-next bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Siguiente</button>
+                    </div>
+                </div>
+                
+                <div id="assessment-step-2" class="assessment-step">
+                    <h4 class="font-bold text-lg mb-3">Paso 2 de 8: ¿Cuál es tu nivel de experiencia?</h4>
+                    <div class="space-y-3">
+                        <label class="flex items-center p-3 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700">
+                            <input type="radio" name="experience" value="beginner" class="mr-3 text-green-500">
+                            <div>
+                                <div class="font-medium">Principiante</div>
+                                <div class="text-sm text-gray-400">Poca o ninguna experiencia en entrenamiento</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center p-3 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700">
+                            <input type="radio" name="experience" value="intermediate" class="mr-3 text-green-500">
+                            <div>
+                                <div class="font-medium">Intermedio</div>
+                                <div class="text-sm text-gray-400">Alguna experiencia, pero no constante</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center p-3 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700">
+                            <input type="radio" name="experience" value="advanced" class="mr-3 text-green-500">
+                            <div>
+                                <div class="font-medium">Avanzado</div>
+                                <div class="text-sm text-gray-400">Entreno regular durante más de 1 año</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="flex justify-between mt-4">
+                        <button type="button" class="assessment-prev px-4 py-2 text-gray-300 hover:text-white">Atrás</button>
+                        <button type="button" class="assessment-next bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Siguiente</button>
+                    </div>
+                </div>
+                
+                <!-- Los siguientes 6 pasos seguirían un patrón similar -->
+                
+                <div id="assessment-step-8" class="assessment-step">
+                    <h4 class="font-bold text-lg mb-3">Paso 8 de 8: Resumen y recomendaciones</h4>
+                    <div class="bg-gray-700 p-4 rounded-lg mb-4">
+                        <h5 class="font-bold mb-2">Resumen de tu evaluación:</h5>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li><strong>Objetivo:</strong> <span id="summary-goal">Perder peso</span></li>
+                            <li><strong>Experiencia:</strong> <span id="summary-experience">Principiante</span></li>
+                            <li><strong>Frecuencia semanal:</strong> <span id="summary-frequency">3 días</span></li>
+                            <li><strong>Equipamiento:</strong> <span id="summary-equipment">Básico en casa</span></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mb-4">
+                        <h5 class="font-bold text-green-400 mb-2">Recomendación personalizada:</h5>
+                        <p class="text-sm text-gray-300">Basado en tus respuestas, te recomendamos comenzar con un plan de entrenamiento de fuerza 3 días por semana, combinado con cardio ligero 2 días. Tu ingesta calórica objetivo sería de aproximadamente <strong>1800-2000 kcal</strong> al día.</p>
+                    </div>
+                    
+                    <div class="flex justify-between mt-4">
+                        <button type="button" class="assessment-prev px-4 py-2 text-gray-300 hover:text-white">Atrás</button>
+                        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Finalizar Evaluación</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Template para Probar la App -->
+        <div id="probar-app-content">
+            <h3 class="text-2xl font-bold mb-4 text-green-400">Demo de la App de Seguimiento</h3>
+            
+            <div class="relative">
+                <video id="app-demo-video" class="rounded-lg w-full" controls poster="https://placehold.co/800x600/1f2937/34d399?text=Demo+App">
+                    <source src="#" type="video/mp4">
+                    Tu navegador no soporta el elemento de video.
+                </video>
+                <button id="pip-toggle" class="absolute top-2 right-2 bg-black/50 text-white p-2 rounded-full hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="mt-4 text-gray-400">
+                <p>Así es como verás tus rutinas y registrarás tu progreso. ¡Fácil e intuitivo!</p>
+            </div>
+            
+            <div class="mt-6 bg-gray-700 p-4 rounded-lg">
+                <h4 class="font-bold mb-2">Prueba la app en modo invitado</h4>
+                <p class="text-sm text-gray-400 mb-4">Accede a una rutina de demostración para experimentar la aplicación.</p>
+                <button id="guest-login" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Acceder como invitado</button>
+            </div>
+            
+            <div class="mt-4 text-center">
+                <button id="add-to-homescreen" class="text-green-400 hover:text-green-300 flex items-center justify-center gap-2 mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Añadir a pantalla de inicio
+                </button>
+            </div>
+        </div>
+
+        <!-- Template para Enviar Vídeo -->
+        <div id="enviar-video-content">
+            <h3 class="text-2xl font-bold mb-4 text-green-400">Revisión de Técnica Gratuita</h3>
+            <p class="mb-4 text-gray-400">Sube un vídeo corto (o un enlace) de un ejercicio y te daré mi feedback en 24-48h.</p>
+            
+            <div id="upload-zone" class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center mb-4 cursor-pointer hover:bg-gray-700/50 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <p class="text-gray-400">Arrastra tu vídeo aquí o haz clic para seleccionar</p>
+                <p class="text-gray-500 text-sm mt-2">Formatos: MP4, MOV (máx. 100MB)</p>
+                <input type="file" id="video-file" class="hidden" accept="video/mp4,video/quicktime">
+            </div>
+            
+            <div id="upload-progress" class="hidden mb-4">
+                <div class="flex justify-between text-sm text-gray-400 mb-1">
+                    <span>Subiendo...</span>
+                    <span id="progress-percent">0%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2">
+                    <div id="progress-bar" class="bg-green-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-2">O introduce un enlace a tu vídeo</label>
+                <input type="url" id="video-url" placeholder="https://youtube.com/... o https://drive.google.com/..." class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 text-white focus:ring-green-500 focus:border-green-500">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Ejercicio</label>
+                    <select id="exercise-name" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 text-white focus:ring-green-500 focus:border-green-500">
+                        <option value="">Selecciona un ejercicio</option>
+                        <option value="squat">Sentadilla</option>
+                        <option value="deadlift">Peso muerto</option>
+                        <option value="bench-press">Press de banca</option>
+                        <option value="overhead-press">Press militar</option>
+                        <option value="pull-up">Dominadas</option>
+                        <option value="other">Otro</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Objetivo del ejercicio</label>
+                    <select id="exercise-goal" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 text-white focus:ring-green-500 focus:border-green-500">
+                        <option value="form-check">Revisión de técnica</option>
+                        <option value="pain-issue">Dolor o molestia</option>
+                        <option value="progression">Progresión de carga</option>
+                        <option value="variation">Variación del ejercicio</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Comentarios adicionales (opcional)</label>
+                <textarea id="video-comments" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 text-white focus:ring-green-500 focus:border-green-500" rows="3" placeholder="Describe qué quieres que revise específicamente..."></textarea>
+            </div>
+            
+            <button id="submit-video" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg btn-loading">Enviar para Revisión</button>
+            
+            <div id="submission-confirmation" class="hidden mt-4 p-4 bg-gray-700 rounded-lg">
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-green-500 font-semibold">Vídeo enviado correctamente</span>
+                </div>
+                <p class="text-gray-400 text-sm mt-2">Nº de ticket: <span id="ticket-number" class="font-mono">T-2023-001</span></p>
+                <p class="text-gray-400 text-sm">Recibirás feedback en 24-48 horas.</p>
+            </div>
+        </div>
+        
+        <!-- Template para Ver Planes y Precios -->
+        <div id="ver-planes-content">
+            <h3 class="text-2xl font-bold mb-4 text-green-400">Planes y Precios</h3>
+            
+            <div class="flex justify-center mb-6">
+                <div class="inline-flex rounded-md p-1 bg-gray-700">
+                    <button type="button" id="toggle-monthly" class="px-4 py-2 rounded-md text-white bg-green-500 font-medium">Mensual</button>
+                    <button type="button" id="toggle-quarterly" class="px-4 py-2 rounded-md text-gray-300 hover:text-white">Trimestral</button>
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="p-6 bg-gray-700 rounded-lg">
+                    <h4 class="font-bold text-lg mb-2">Online Básico</h4>
+                    <div class="mb-4">
+                        <span class="text-3xl font-bold" id="basic-price">49€</span>
+                        <span class="text-gray-400">/mes</span>
+                    </div>
+                    <ul class="text-sm text-gray-300 space-y-2 mb-4">
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Rutina mensual personalizada
+                        </li>
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Soporte por WhatsApp
+                        </li>
+                        <li class="flex items-center text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            Revisión semanal
+                        </li>
+                        <li class="flex items-center text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            Plan nutricional
+                        </li>
+                    </ul>
+                    <button class="w-full bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 font-semibold py-2 px-4 rounded-lg transition-colors">Seleccionar</button>
+                </div>
+                
+                <div class="p-6 bg-gray-700 rounded-lg border-2 border-green-500 relative">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">RECOMENDADO</span>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2">Online Premium</h4>
+                    <div class="mb-4">
+                        <span class="text-3xl font-bold" id="premium-price">89€</span>
+                        <span class="text-gray-400">/mes</span>
+                        <div class="text-green-400 text-sm" id="premium-savings">Ahorras 20€/trimestre</div>
+                    </div>
+                    <ul class="text-sm text-gray-300 space-y-2 mb-4">
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Rutina adaptativa semanal
+                        </li>
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Revisión y ajustes semanales
+                        </li>
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Plan nutricional personalizado
+                        </li>
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Soporte prioritario 24/7
+                        </li>
+                    </ul>
+                    <button class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Seleccionar</button>
+                </div>
+                
+                <div class="p-6 bg-gray-700 rounded-lg">
+                    <h4 class="font-bold text-lg mb-2">Presencial 1-a-1</h4>
+                    <div class="mb-4">
+                        <span class="text-3xl font-bold">40€</span>
+                        <span class="text-gray-400">/sesión</span>
+                    </div>
+                    <ul class="text-sm text-gray-300 space-y-2 mb-4">
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Entrenamiento personalizado
+                        </li>
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Corrección de técnica en tiempo real
+                        </li>
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            A domicilio o en box
+                        </li>
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Bono 10 sesiones: 350€
+                        </li>
+                    </ul>
+                    <button class="w-full bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 font-semibold py-2 px-4 rounded-lg transition-colors">Seleccionar</button>
+                </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-gray-700 rounded-lg">
+                <h4 class="font-bold mb-2">Garantía de satisfacción</h4>
+                <p class="text-sm text-gray-400">Si en los primeros 7 días no estás satisfecho, te devolvemos el 100% de tu dinero.</p>
+            </div>
+        </div>
+
+        <!-- Template para Calculadora de Macros -->
+        <div id="calcular-macros-content">
+            <h3 class="text-2xl font-bold mb-4 text-green-400">Calculadora de Calorías y Macros</h3>
+            <form id="tdee-form" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Género</label>
+                        <select id="gender" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500">
+                            <option value="male">Hombre</option>
+                            <option value="female">Mujer</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Edad</label>
+                        <input id="age" type="number" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Peso (kg)</label>
+                        <input id="weight" type="number" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Altura (cm)</label>
+                        <input id="height" type="number" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-300">Nivel de Actividad</label>
+                    <select id="activity" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500">
+                        <option value="1.2">Sedentario (poco o ningún ejercicio)</option>
+                        <option value="1.375">Ligero (1-3 días/semana)</option>
+                        <option value="1.55">Moderado (3-5 días/semana)</option>
+                        <option value="1.725">Activo (6-7 días/semana)</option>
+                        <option value="1.9">Muy Activo (ejercicio físico 2 veces al día)</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-300">Objetivo</label>
+                    <div class="mt-2 space-y-2">
+                        <label class="flex items-center">
+                            <input type="radio" name="goal" value="loss" class="mr-2 text-green-500" checked>
+                            <span>Pérdida de grasa</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="goal" value="maintenance" class="mr-2 text-green-500">
+                            <span>Mantenimiento</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="goal" value="gain" class="mr-2 text-green-500">
+                            <span>Ganancia muscular</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Calcular</button>
+            </form>
+            
+            <div id="tdee-result" class="mt-4 p-4 bg-gray-700 rounded-lg hidden">
+                <h4 class="font-bold text-lg mb-2 text-green-400">Tus resultados</h4>
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-gray-300">Metabolismo basal (BMR)</span>
+                        <span id="bmr-result" class="text-white font-bold">0 kcal</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-300">Calorías de mantenimiento (TDEE)</span>
+                        <span id="tdee-result-value" class="text-white font-bold">0 kcal</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-300">Objetivo diario</span>
+                        <span id="goal-calories" class="text-white font-bold">0 kcal</span>
+                    </div>
+                    
+                    <div class="border-t border-gray-600 pt-3 mt-3">
+                        <h5 class="font-bold mb-2">Distribución de macronutrientes</h5>
+                        <div class="space-y-2">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-300">Proteínas</span>
+                                    <span id="protein-grams" class="text-white">0g</span>
+                                </div>
+                                <div class="w-full bg-gray-600 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: 30%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-300">Carbohidratos</span>
+                                    <span id="carbs-grams" class="text-white">0g</span>
+                                </div>
+                                <div class="w-full bg-gray-600 rounded-full h-2">
+                                    <div class="bg-yellow-500 h-2 rounded-full" style="width: 40%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-300">Grasas</span>
+                                    <span id="fats-grams" class="text-white">0g</span>
+                                </div>
+                                <div class="w-full bg-gray-600 rounded-full h-2">
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: 30%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 flex space-x-2">
+                    <button id="save-to-profile" class="flex-1 bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 font-semibold py-2 px-4 rounded-lg transition-colors">
+                        Guardar en perfil
+                    </button>
+                    <button id="export-pdf" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">
+                        Exportar PDF
+                    </button>
+                </div>
+                
+                <div class="mt-4">
+                    <button id="apply-to-plan" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">
+                        Aplicar a mi plan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template para Menú de Muestra -->
+        <div id="ver-menu-content">
+            <h3 class="text-2xl font-bold mb-4 text-green-400">Menú de Ejemplo (Plan Pérdida de Grasa)</h3>
+            
+            <div class="mb-4 flex space-x-2">
+                <button class="diet-filter active px-3 py-1 rounded-full bg-green-500 text-white text-sm">Mediterráneo</button>
+                <button class="diet-filter px-3 py-1 rounded-full bg-gray-700 text-gray-300 text-sm">Vegetariano</button>
+                <button class="diet-filter px-3 py-1 rounded-full bg-gray-700 text-gray-300 text-sm">Sin gluten</button>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <h4 class="font-bold text-lg mb-3">Día 1</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front bg-gray-700 rounded-lg">
+                                    <h5 class="font-bold mb-2">Desayuno</h5>
+                                    <p class="text-sm text-gray-300">Avena con frutos rojos y nueces</p>
+                                    <p class="text-xs text-gray-500 mt-2">~350 kcal</p>
+                                </div>
+                                <div class="flip-card-back">
+                                    <h5 class="font-bold mb-2">Alternativa</h5>
+                                    <p class="text-sm text-gray-300">Tostadas integrales con aguacate y huevo</p>
+                                    <p class="text-xs text-gray-500 mt-2">~320 kcal</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front bg-gray-700 rounded-lg">
+                                    <h5 class="font-bold mb-2">Comida</h5>
+                                    <p class="text-sm text-gray-300">Pollo a la plancha con quinoa y brócoli</p>
+                                    <p class="text-xs text-gray-500 mt-2">~450 kcal</p>
+                                </div>
+                                <div class="flip-card-back">
+                                    <h5 class="font-bold mb-2">Alternativa</h5>
+                                    <p class="text-sm text-gray-300">Salmón al horno con espárragos</p>
+                                    <p class="text-xs text-gray-500 mt-2">~480 kcal</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front bg-gray-700 rounded-lg">
+                                    <h5 class="font-bold mb-2">Cena</h5>
+                                    <p class="text-sm text-gray-300">Ensalada completa con atún y huevo</p>
+                                    <p class="text-xs text-gray-500 mt-2">~380 kcal</p>
+                                </div>
+                                <div class="flip-card-back">
+                                    <h5 class="font-bold mb-2">Alternativa</h5>
+                                    <p class="text-sm text-gray-300">Crema de calabacín con pavo</p>
+                                    <p class="text-xs text-gray-500 mt-2">~350 kcal</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-lg mb-3">Día 2</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front bg-gray-700 rounded-lg">
+                                    <h5 class="font-bold mb-2">Desayuno</h5>
+                                    <p class="text-sm text-gray-300">Yogur griego con nueces y miel</p>
+                                    <p class="text-xs text-gray-500 mt-2">~280 kcal</p>
+                                </div>
+                                <div class="flip-card-back">
+                                    <h5 class="font-bold mb-2">Alternativa</h5>
+                                    <p class="text-sm text-gray-300">Batido de proteínas con plátano</p>
+                                    <p class="text-xs text-gray-500 mt-2">~300 kcal</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front bg-gray-700 rounded-lg">
+                                    <h5 class="font-bold mb-2">Comida</h5>
+                                    <p class="text-sm text-gray-300">Salmón al horno con brócoli</p>
+                                    <p class="text-xs text-gray-500 mt-2">~480 kcal</p>
+                                </div>
+                                <div class="flip-card-back">
+                                    <h5 class="font-bold mb-2">Alternativa</h5>
+                                    <p class="text-sm text-gray-300">Lentejas estofadas con verduras</p>
+                                    <p class="text-xs text-gray-500 mt-2">~420 kcal</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front bg-gray-700 rounded-lg">
+                                    <h5 class="font-bold mb-2">Cena</h5>
+                                    <p class="text-sm text-gray-300">Crema de calabacín</p>
+                                    <p class="text-xs text-gray-500 mt-2">~250 kcal</p>
+                                </div>
+                                <div class="flip-card-back">
+                                    <h5 class="font-bold mb-2">Alternativa</h5>
+                                    <p class="text-sm text-gray-300">Revuelto de huevos con espinacas</p>
+                                    <p class="text-xs text-gray-500 mt-2">~320 kcal</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-lg mb-3">Día 3</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front bg-gray-700 rounded-lg">
+                                    <h5 class="font-bold mb-2">Desayuno</h5>
+                                    <p class="text-sm text-gray-300">Tostadas integrales con aguacate</p>
+                                    <p class="text-xs text-gray-500 mt-2">~320 kcal</p>
+                                </div>
+                                <div class="flip-card-back">
+                                    <h5 class="font-bold mb-2">Alternativa</h5>
+                                    <p class="text-sm text-gray-300">Porridge de avena con canela</p>
+                                    <p class="text-xs text-gray-500 mt-2">~290 kcal</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front bg-gray-700 rounded-lg">
+                                    <h5 class="font-bold mb-2">Comida</h5>
+                                    <p class="text-sm text-gray-300">Lentejas estofadas</p>
+                                    <p class="text-xs text-gray-500 mt-2">~420 kcal</p>
+                                </div>
+                                <div class="flip-card-back">
+                                    <h5 class="font-bold mb-2">Alternativa</h5>
+                                    <p class="text-sm text-gray-300">Ensalada de garbanzos y atún</p>
+                                    <p class="text-xs text-gray-500 mt-2">~380 kcal</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front bg-gray-700 rounded-lg">
+                                    <h5 class="font-bold mb-2">Cena</h5>
+                                    <p class="text-sm text-gray-300">Revuelto de huevos con espinacas</p>
+                                    <p class="text-xs text-gray-500 mt-2">~320 kcal</p>
+                                </div>
+                                <div class="flip-card-back">
+                                    <h5 class="font-bold mb-2">Alternativa</h5>
+                                    <p class="text-sm text-gray-300">Pechuga de pavo con ensalada</p>
+                                    <p class="text-xs text-gray-500 mt-2">~300 kcal</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex space-x-4">
+                <button id="download-menu-pdf" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Descargar PDF
+                </button>
+                <button id="generate-shopping-list" class="flex-1 bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 font-semibold py-2 px-4 rounded-lg transition-colors">
+                    Generar lista de compra
+                </button>
+            </div>
+        </div>
+        
+        <!-- Template para Preferencias -->
+        <div id="preferencias-content">
+            <h3 class="text-2xl font-bold mb-4 text-green-400">Preferencias y Restricciones</h3>
+            <p class="mb-4 text-gray-400">Personaliza tu plan nutricional según tus gustos y necesidades.</p>
+            
+            <form id="preferences-form" class="space-y-6">
+                <div>
+                    <h4 class="font-bold text-lg mb-3">Alergias e intolerancias</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="allergies" value="lactose" class="mr-2 text-green-500">
+                            <span>Lactosa</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="allergies" value="gluten" class="mr-2 text-green-500">
+                            <span>Gluten</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="allergies" value="nuts" class="mr-2 text-green-500">
+                            <span>Frutos secos</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="allergies" value="seafood" class="mr-2 text-green-500">
+                            <span>Mariscos</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="allergies" value="eggs" class="mr-2 text-green-500">
+                            <span>Huevos</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="allergies" value="soy" class="mr-2 text-green-500">
+                            <span>Soja</span>
+                        </label>
+                    </div>
+                    <div class="mt-2">
+                        <input type="text" name="other-allergies" placeholder="Otras alergias..." class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1 text-white focus:ring-green-500 focus:border-green-500">
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-lg mb-3">Alimentos que no te gustan <span class="text-sm text-gray-400">(máx. 5)</span></h4>
+                    <div class="flex flex-wrap gap-2 mb-2" id="dislikes-chips">
+                        <!-- Los chips de alimentos que no gustan se añadirán aquí -->
+                    </div>
+                    <div class="flex">
+                        <input type="text" id="dislike-input" placeholder="Añadir alimento..." class="flex-grow bg-gray-700 border border-gray-600 rounded-l-md p-2 text-white focus:ring-green-500 focus:border-green-500">
+                        <button type="button" id="add-dislike" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-r-md">Añadir</button>
+                    </div>
+                    <div class="text-sm text-gray-400 mt-1" id="dislikes-counter">0/5</div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-lg mb-3">Horarios de comidas</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-300">Desayuno</span>
+                            <input type="time" value="08:00" class="bg-gray-700 border border-gray-600 rounded-md p-2 text-white">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-300">Comida</span>
+                            <input type="time" value="14:00" class="bg-gray-700 border border-gray-600 rounded-md p-2 text-white">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-300">Cena</span>
+                            <input type="time" value="20:00" class="bg-gray-700 border border-gray-600 rounded-md p-2 text-white">
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-lg mb-3">Estilo de cocina preferido</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <label class="flex items-center">
+                            <input type="radio" name="cooking-style" value="mediterranean" class="mr-2 text-green-500" checked>
+                            <span>Mediterránea</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="cooking-style" value="asian" class="mr-2 text-green-500">
+                            <span>Asiática</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="cooking-style" value="mexican" class="mr-2 text-green-500">
+                            <span>Mexicana</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="cooking-style" value="simple" class="mr-2 text-green-500">
+                            <span>Comida simple</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Guardar Preferencias</button>
+            </form>
+        </div>
+
+        <!-- Template para Lista de Compra -->
+        <div id="lista-compra-content">
+            <h3 class="text-2xl font-bold mb-4 text-green-400">Lista de la Compra Semanal</h3>
+            
+            <div class="mb-4 flex items-center justify-between">
+                <div class="flex items-center">
+                    <input type="checkbox" id="exclude-basics" class="mr-2 text-green-500">
+                    <label for="exclude-basics" class="text-sm text-gray-300">Excluir básicos (aceite, sal, especias)</label>
+                </div>
+                <div class="text-sm text-gray-400" id="item-count">0 artículos</div>
+            </div>
+            
+            <div class="bg-gray-700 rounded-lg p-4 mb-4">
+                <h4 class="font-bold mb-3">Lista organizada por pasillos</h4>
+                
+                <div class="space-y-4">
+                    <div>
+                        <h5 class="font-bold text-green-400 mb-2">Proteínas</h5>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="protein">
+                                <span>Pechugas de pollo (500g)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="protein">
+                                <span>Salmón (2 filetes)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="protein">
+                                <span>Huevos (12 unidades)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="protein">
+                                <span>Lentejas (400g)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="protein">
+                                <span>Atún en lata (2 latas)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h5 class="font-bold text-green-400 mb-2">Carbohidratos</h5>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="carbs">
+                                <span>Avena (500g)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="carbs">
+                                <span>Quinoa (250g)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="carbs">
+                                <span>Pan integral</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="carbs">
+                                <span>Batata (2 unidades)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h5 class="font-bold text-green-400 mb-2">Grasas saludables</h5>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="fats">
+                                <span>Aguacate (3 unidades)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="fats">
+                                <span>Nueces (200g)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="fats">
+                                <span>Aceite de oliva virgen extra</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h5 class="font-bold text-green-400 mb-2">Verduras y Frutas</h5>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="produce">
+                                <span>Brócoli (1 unidad)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="produce">
+                                <span>Espinacas (200g)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="produce">
+                                <span>Calabacín (2 unidades)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="produce">
+                                <span>Plátanos (4 unidades)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-green-500 grocery-item" data-category="produce">
+                                <span>Frutos rojos (200g)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <button id="export-grocery-pdf" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Exportar PDF
+                </button>
+                <button id="export-grocery-csv" class="bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 font-semibold py-2 px-4 rounded-lg transition-colors">
+                    Exportar CSV
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <button id="share-grocery-whatsapp" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.267.655 4.398 1.806 6.151l-1.29 4.723 4.793-1.261z"/>
+                    </svg>
+                    Compartir WhatsApp
+                </button>
+                <button id="send-grocery-email" class="bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 font-semibold py-2 px-4 rounded-lg transition-colors">
+                    Enviar por email
+                </button>
+            </div>
+        </div>
+
+        <!-- Template para Suscripción Nutrición -->
+        <div id="suscripcion-nutricion-content">
+            <h3 class="text-2xl font-bold mb-4 text-green-400">Suscripción a Plan Nutricional</h3>
+            
+            <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mb-4">
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-green-500 font-semibold">Prueba 7 días gratis</span>
+                </div>
+            </div>
+            
+            <div class="space-y-4 mb-6">
+                <div class="p-6 bg-gray-700 rounded-lg">
+                    <h4 class="font-bold text-lg mb-2">Plan Individual</h4>
+                    <div class="mb-4">
+                        <span class="text-3xl font-bold">29€</span>
+                        <span class="text-gray-400">/mes</span>
+                    </div>
+                    <ul class="text-sm text-gray-300 space-y-2 mb-4">
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Plan nutricional personalizado
+                        </li>
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Recetas y menús semanales
+                        </li>
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Ajustes según progreso
+                        </li>
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Soporte por email
+                        </li>
+                    </ul>
+                    <button class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Seleccionar</button>
+                </div>
+                
+                <div class="p-6 bg-gray-700 rounded-lg border-2 border-green-500 relative">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">MÁS POPULAR</span>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2">Plan Familiar</h4>
+                    <div class="mb-4">
+                        <span class="text-3xl font-bold">49€</span>
+                        <span class="text-gray-400">/mes</span>
+                        <div class="text-green-400 text-sm">Para hasta 2 personas</div>
+                    </div>
+                    <ul class="text-sm text-gray-300 space-y-2 mb-4">
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Planes para hasta 2 personas
+                        </li>
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Menús familiares coordinados
+                        </li>
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Recetas optimizadas para familias
+                        </li>
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Soporte prioritario
+                        </li>
+                    </ul>
+                    <button class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Seleccionar</button>
+                </div>
+            </div>
+            
+            <div class="p-4 bg-gray-700 rounded-lg">
+                <h4 class="font-bold mb-2">Gestión de suscripción</h4>
+                <p class="text-sm text-gray-400 mb-4">Pausa o cancela tu suscripción cuando quieras desde tu panel personal.</p>
+                <div class="flex space-x-2">
+                    <button class="flex-1 bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 font-semibold py-2 px-4 rounded-lg transition-colors">
+                        Pausar suscripción
+                    </button>
+                    <button class="flex-1 bg-transparent border border-red-400 text-red-400 hover:bg-red-400 hover:text-gray-900 font-semibold py-2 px-4 rounded-lg transition-colors">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Configuración de Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+
+        // Variables globales
+        let currentModal = null;
+        let currentWizardStep = 1;
+        let currentAssessmentStep = 1;
+        let map;
+        let selectedSlot = null;
+        let groupSize = 2;
+        let groupPricePerPerson = 15;
+        let dislikes = [];
+        let countdownTimer = 900; // 15 minutos en segundos
+
+        // Inicialización al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Año actual en el footer
+            document.getElementById('year').textContent = new Date().getFullYear();
+            
+            // Menú móvil
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+            
+            // Configurar todos los botones que abren modales
+            document.querySelectorAll('[data-modal-target]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const target = this.getAttribute('data-modal-target');
+                    openModal(target);
+                    
+                    // Track GA4 event
+                    trackGA4Event('cta_click', {
+                        button_id: target,
+                        service: getServiceFromButton(this),
+                        placement: 'services_section',
+                        variant: 'primary',
+                        device: isMobile() ? 'mobile' : 'desktop'
+                    });
+                });
+            });
+            
+            // Cerrar modal
+            document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+            document.getElementById('main-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+            
+            // Drawer de disponibilidad
+            document.getElementById('open-availability-drawer').addEventListener('click', openAvailabilityDrawer);
+            document.getElementById('close-availability-drawer').addEventListener('click', closeAvailabilityDrawer);
+            
+            // Configurar filtros del drawer
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active', 'bg-green-500', 'text-white'));
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.add('bg-gray-700', 'text-gray-300'));
+                    this.classList.remove('bg-gray-700', 'text-gray-300');
+                    this.classList.add('active', 'bg-green-500', 'text-white');
+                    
+                    // Aquí iría la lógica para filtrar los slots
+                    filterAvailabilitySlots(this.textContent.trim());
+                });
+            });
+            
+            // Configurar wizard de reserva
+            setupReservationWizard();
+            
+            // Configurar entrenamiento en grupo
+            setupGroupTraining();
+            
+            // Configurar contador de sesión de prueba
+            setupTrialCountdown();
+            
+            // Configurar mapa de cobertura
+            setupCoverageMap();
+            
+            // Configurar evaluación inicial
+            setupAssessmentQuiz();
+            
+            // Configurar subida de vídeo
+            setupVideoUpload();
+            
+            // Configurar calculadora de macros
+            setupMacroCalculator();
+            
+            // Configurar preferencias alimentarias
+            setupFoodPreferences();
+            
+            // Configurar lista de compra
+            setupGroceryList();
+            
+            // Simular carga de datos iniciales
+            simulateInitialDataLoad();
+            
+            // Simular estado online/offline
+            simulateOnlineStatus();
+        });
+
+        // Funciones para modales
+        function openModal(modalId) {
+            const modal = document.getElementById('main-modal');
+            const modalBody = document.getElementById('modal-body');
+            const template = document.getElementById(modalId + '-content');
+            
+            if (template) {
+                modalBody.innerHTML = template.innerHTML;
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.add('opacity-100');
+                    document.querySelector('.modal-content').classList.remove('scale-95');
+                    document.querySelector('.modal-content').classList.add('scale-100');
+                }, 10);
+                
+                currentModal = modalId;
+                
+                // Inicializar componentes específicos del modal
+                if (modalId === 'reservar-sesion') {
+                    initializeReservationWizard();
+                } else if (modalId === 'entreno-domicilio') {
+                    initializeMap();
+                } else if (modalId === 'probar-app') {
+                    initializeAppDemo();
+                }
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('main-modal');
+            modal.classList.remove('opacity-100');
+            document.querySelector('.modal-content').classList.remove('scale-100');
+            document.querySelector('.modal-content').classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                currentModal = null;
+                // Resetear wizards
+                if (currentWizardStep > 1) {
+                    currentWizardStep = 1;
+                }
+                if (currentAssessmentStep > 1) {
+                    currentAssessmentStep = 1;
+                }
+            }, 300);
+        }
+
+        // Funciones para drawer de disponibilidad
+        function openAvailabilityDrawer() {
+            const drawer = document.getElementById('availability-drawer');
+            drawer.classList.add('open');
+            
+            // Simular carga de slots
+            simulateAvailabilitySlots();
+            
+            // Track GA4 event
+            trackGA4Event('availability_open', {
+                service: 'personal_training',
+                device: isMobile() ? 'mobile' : 'desktop'
+            });
+        }
+
+        function closeAvailabilityDrawer() {
+            const drawer = document.getElementById('availability-drawer');
+            drawer.classList.remove('open');
+        }
+
+        function filterAvailabilitySlots(filter) {
+            // En una implementación real, aquí se filtrarían los slots según el criterio
+            console.log(`Filtrando por: ${filter}`);
+            // Por ahora solo simulamos un cambio visual
+            document.getElementById('availability-slots').innerHTML = '<div class="skeleton h-12"></div><div class="skeleton h-12"></div><div class="skeleton h-12"></div>';
+            
+            setTimeout(() => {
+                simulateAvailabilitySlots();
+            }, 1000);
+        }
+
+        // Funciones para wizard de reserva
+        function setupReservationWizard() {
+            // Estos eventos se configurarán cuando se abra el modal
+        }
+
+        function initializeReservationWizard() {
+            // Configurar navegación del wizard
+            document.getElementById('next-to-step-2').addEventListener('click', () => navigateWizard(2));
+            document.getElementById('back-to-step-1').addEventListener('click', () => navigateWizard(1));
+            document.getElementById('next-to-step-3').addEventListener('click', () => navigateWizard(3));
+            document.getElementById('back-to-step-2').addEventListener('click', () => navigateWizard(2));
+            document.getElementById('next-to-step-4').addEventListener('click', () => navigateWizard(4));
+            document.getElementById('back-to-step-3').addEventListener('click', () => navigateWizard(3));
+            document.getElementById('process-payment').addEventListener('click', processPayment);
+            document.getElementById('close-reservation').addEventListener('click', closeModal);
+            
+            // Cargar horarios disponibles
+            loadScheduleSlots();
+        }
+
+        function navigateWizard(step) {
+            // Validar paso actual antes de navegar
+            if (step > currentWizardStep && !validateCurrentStep(currentWizardStep)) {
+                showToast('Por favor, completa todos los campos requeridos', 'error');
+                return;
+            }
+            
+            // Ocultar paso actual
+            document.getElementById(`step-${currentWizardStep}`).classList.remove('active');
+            
+            // Mostrar nuevo paso
+            document.getElementById(`step-${step}`).classList.add('active');
+            
+            // Actualizar barra de progreso
+            const progressPercentage = (step / 5) * 100;
+            document.getElementById('reservation-progress').style.width = `${progressPercentage}%`;
+            
+            // Actualizar paso actual
+            currentWizardStep = step;
+            
+            // Acciones específicas por paso
+            if (step === 5) {
+                // Confirmación - mostrar resumen
+                showReservationSummary();
+                // Simular confeti
+                createConfetti();
+                
+                // Track GA4 event
+                trackGA4Event('purchase', {
+                    value: 40,
+                    currency: 'EUR',
+                    items: [{
+                        item_id: 'session_1a1',
+                        item_name: 'Sesión Entrenamiento Personal',
+                        item_category: 'personal_training'
+                    }]
+                });
+            }
+        }
+
+        function validateCurrentStep(step) {
+            if (step === 1) {
+                // Validar selección de servicio
+                const form = document.getElementById('service-form');
+                return form.checkValidity();
+            } else if (step === 2) {
+                // Validar selección de horario
+                return selectedSlot !== null;
+            } else if (step === 3) {
+                // Validar datos de usuario
+                const form = document.getElementById('user-data-form');
+                return form.checkValidity();
+            }
+            return true;
+        }
+
+        function loadScheduleSlots() {
+            const container = document.getElementById('schedule-container');
+            container.innerHTML = '';
+            
+            // Simular slots de horarios
+            const slots = [
+                { time: '10:00', date: 'Viernes 15', available: true },
+                { time: '11:30', date: 'Viernes 15', available: true },
+                { time: '16:00', date: 'Viernes 15', available: false },
+                { time: '17:30', date: 'Viernes 15', available: true },
+                { time: '19:00', date: 'Viernes 15', available: true },
+                { time: '09:00', date: 'Sábado 16', available: true },
+                { time: '10:30', date: 'Sábado 16', available: true },
+                { time: '12:00', date: 'Sábado 16', available: false }
+            ];
+            
+            slots.forEach(slot => {
+                const slotElement = document.createElement('div');
+                slotElement.className = `schedule-slot p-3 border border-gray-600 rounded-lg cursor-pointer text-center ${slot.available ? 'hover:bg-green-500 hover:text-gray-900' : 'opacity-50 cursor-not-allowed disabled'}`;
+                slotElement.innerHTML = `
+                    <div class="font-semibold">${slot.time}</div>
+                    <div class="text-sm text-gray-400">${slot.date}</div>
+                `;
+                
+                if (slot.available) {
+                    slotElement.addEventListener('click', () => {
+                        document.querySelectorAll('.schedule-slot').forEach(s => s.classList.remove('bg-green-500', 'text-gray-900'));
+                        slotElement.classList.add('bg-green-500', 'text-gray-900');
+                        selectedSlot = slot;
+                    });
+                }
+                
+                container.appendChild(slotElement);
+            });
+        }
+
+        function processPayment() {
+            const button = document.getElementById('process-payment');
+            button.classList.add('btn-loading');
+            button.disabled = true;
+            
+            // Simular procesamiento de pago
+            setTimeout(() => {
+                button.classList.remove('btn-loading');
+                button.disabled = false;
+                
+                // En una implementación real, aquí se procesaría el pago con Stripe
+                // Por ahora simulamos éxito
+                navigateWizard(5);
+                
+                // Track GA4 event
+                trackGA4Event('add_payment_info', {
+                    value: 8,
+                    currency: 'EUR',
+                    payment_type: 'card'
+                });
+            }, 2000);
+        }
+
+        function showReservationSummary() {
+            // Obtener datos del formulario de servicio
+            const modality = document.querySelector('input[name="modality"]:checked').value;
+            const duration = document.querySelector('input[name="duration"]:checked').value;
+            
+            // Actualizar resumen en el paso 5
+            if (selectedSlot) {
+                document.getElementById('confirmed-date-time').textContent = `${selectedSlot.date}, ${selectedSlot.time}`;
+            }
+            
+            document.getElementById('confirmed-type').textContent = getModalityText(modality);
+            document.getElementById('confirmed-duration').textContent = `${duration} min`;
+            
+            // Calcular total (en una implementación real, esto vendría del backend)
+            const total = modality === '1a1' ? 40 : modality === 'group' ? 30 : 35;
+            document.getElementById('confirmed-total').textContent = `${total}€`;
+        }
+
+        function getModalityText(modality) {
+            const modalities = {
+                '1a1': 'Entrenamiento 1-a-1',
+                'group': 'Entrenamiento en Grupo',
+                'online': 'Entrenamiento Online',
+                'home': 'Entrenamiento a Domicilio'
+            };
+            return modalities[modality] || 'Entrenamiento Personal';
+        }
+
+        // Funciones para entrenamiento en grupo
+        function setupGroupTraining() {
+            // Estos eventos se configurarán cuando se abra el modal
+        }
+
+        function initializeGroupTraining() {
+            document.getElementById('increase-group').addEventListener('click', () => updateGroupSize(1));
+            document.getElementById('decrease-group').addEventListener('click', () => updateGroupSize(-1));
+            document.getElementById('create-whatsapp-group').addEventListener('click', createWhatsAppGroup);
+            document.getElementById('split-payment').addEventListener('click', setupSplitPayment);
+            
+            // Cargar horarios compatibles
+            loadGroupSchedule();
+        }
+
+        function updateGroupSize(change) {
+            groupSize = Math.max(2, Math.min(3, groupSize + change));
+            document.getElementById('group-size').textContent = groupSize;
+            
+            // Actualizar precios
+            groupPricePerPerson = groupSize === 2 ? 15 : 13;
+            document.getElementById('price-per-person').textContent = `${groupPricePerPerson}€`;
+            document.getElementById('group-total').textContent = `${groupSize * groupPricePerPerson}€`;
+            
+            // Animación del precio
+            document.querySelectorAll('.price-ticker').forEach(el => {
+                el.classList.add('scale-110');
+                setTimeout(() => {
+                    el.classList.remove('scale-110');
+                }, 300);
+            });
+        }
+
+        function createWhatsAppGroup() {
+            const message = `Hola, estoy organizando un grupo de entrenamiento de ${groupSize} personas. ¿Te interesa unirte?`;
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+            
+            // Track GA4 event
+            trackGA4Event('group_whatsapp_create', {
+                group_size: groupSize,
+                price_per_person: groupPricePerPerson
+            });
+        }
+
+        function setupSplitPayment() {
+            showToast('Funcionalidad de pago dividido activada. Cada persona pagará su parte por separado.', 'success');
+            
+            // Track GA4 event
+            trackGA4Event('group_splitpay_select', {
+                group_size: groupSize
+            });
+        }
+
+        function loadGroupSchedule() {
+            const container = document.getElementById('group-schedule');
+            container.innerHTML = '';
+            
+            // Simular horarios compatibles para grupos
+            const groupSlots = [
+                { time: '18:00', date: 'Viernes 15', available: true },
+                { time: '19:30', date: 'Viernes 15', available: true },
+                { time: '10:00', date: 'Sábado 16', available: true },
+                { time: '11:30', date: 'Sábado 16', available: false }
+            ];
+            
+            groupSlots.forEach(slot => {
+                const slotElement = document.createElement('div');
+                slotElement.className = `p-2 border border-gray-600 rounded-lg text-center ${slot.available ? 'bg-gray-700' : 'opacity-50'}`;
+                slotElement.innerHTML = `
+                    <div class="font-semibold">${slot.time}</div>
+                    <div class="text-sm text-gray-400">${slot.date}</div>
+                `;
+                container.appendChild(slotElement);
+            });
+        }
+
+        // Funciones para sesión de prueba
+        function setupTrialCountdown() {
+            // Actualizar contador cada segundo
+            setInterval(() => {
+                countdownTimer--;
+                if (countdownTimer <= 0) {
+                    countdownTimer = 900; // Resetear a 15 minutos
+                }
+                
+                const minutes = Math.floor(countdownTimer / 60);
+                const seconds = countdownTimer % 60;
+                document.getElementById('countdown-timer').textContent = 
+                    `Termina en ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Funciones para mapa de cobertura
+        function setupCoverageMap() {
+            // Estos eventos se configurarán cuando se abra el modal
+        }
+
+        function initializeMap() {
+            document.getElementById('show-map-btn').addEventListener('click', showCoverageMap);
+            document.getElementById('detect-location').addEventListener('click', detectUserLocation);
+            document.getElementById('send-address-whatsapp').addEventListener('click', sendAddressViaWhatsApp);
+        }
+
+        function showCoverageMap() {
+            const address = document.getElementById('address-input').value;
+            if (!address) {
+                showToast('Por favor, introduce una dirección', 'error');
+                return;
+            }
+            
+            document.getElementById('map').classList.remove('hidden');
+            document.getElementById('send-address-whatsapp').classList.remove('hidden');
+            
+            // En una implementación real, aquí se geocodificaría la dirección y se mostraría en el mapa
+            // Por ahora simulamos una respuesta
+            simulateCoverageCheck(address);
+            
+            // Track GA4 event
+            trackGA4Event('at_home_checker_open', {
+                service: 'home_training'
+            });
+        }
+
+        function detectUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        // En una implementación real, aquí se reverse-geocodificarían las coordenadas
+                        // Por ahora usamos una dirección de ejemplo
+                        document.getElementById('address-input').value = 'Calle Ejemplo, 28001 Madrid';
+                        showToast('Ubicación detectada correctamente', 'success');
+                    },
+                    error => {
+                        showToast('No se pudo detectar tu ubicación', 'error');
+                        console.error('Error getting location:', error);
+                    }
+                );
+            } else {
+                showToast('La geolocalización no es compatible con tu navegador', 'error');
+            }
+        }
+
+        function simulateCoverageCheck(address) {
+            const coverageResult = document.getElementById('coverage-result');
+            coverageResult.classList.remove('hidden');
+            
+            // Simular diferentes resultados basados en la dirección
+            if (address.toLowerCase().includes('madrid')) {
+                coverageResult.innerHTML = `
+                    <div class="flex items-center text-green-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="font-semibold">¡Perfecto! Estás en mi zona de cobertura.</span>
+                    </div>
+                    <p class="text-sm text-gray-400 mt-1">No hay recargo por desplazamiento.</p>
+                `;
+                
+                // Track GA4 event
+                trackGA4Event('zone_ok', {
+                    distance_km: 2.5,
+                    surcharge: 0
+                });
+            } else {
+                coverageResult.innerHTML = `
+                    <div class="flex items-center text-yellow-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="font-semibold">Zona con recargo</span>
+                    </div>
+                    <p class="text-sm text-gray-400 mt-1">Se aplicará un recargo de 5€ por sesión por desplazamiento.</p>
+                `;
+                
+                // Track GA4 event
+                trackGA4Event('zone_out', {
+                    distance_km: 12.7,
+                    surcharge: 5
+                });
+            }
+        }
+
+        function sendAddressViaWhatsApp() {
+            const address = document.getElementById('address-input').value;
+            const message = `Hola, esta es mi dirección para el entrenamiento a domicilio: ${address}`;
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/34654310942?text=${encodedMessage}`, '_blank');
+        }
+
+        // Funciones para evaluación inicial
+        function setupAssessmentQuiz() {
+            // Estos eventos se configurarán cuando se abra el modal
+        }
+
+        function initializeAssessmentQuiz() {
+            document.querySelectorAll('.assessment-next').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    navigateAssessment(1);
+                });
+            });
+            
+            document.querySelectorAll('.assessment-prev').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    navigateAssessment(-1);
+                });
+            });
+            
+            document.getElementById('assessment-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                completeAssessment();
+            });
+        }
+
+        function navigateAssessment(direction) {
+            const newStep = currentAssessmentStep + direction;
+            
+            if (newStep < 1 || newStep > 8) return;
+            
+            // Ocultar paso actual
+            document.getElementById(`assessment-step-${currentAssessmentStep}`).classList.remove('active');
+            
+            // Mostrar nuevo paso
+            document.getElementById(`assessment-step-${newStep}`).classList.add('active');
+            
+            // Actualizar barra de progreso
+            const progressPercentage = (newStep / 8) * 100;
+            document.getElementById('assessment-progress').style.width = `${progressPercentage}%`;
+            
+            // Actualizar paso actual
+            currentAssessmentStep = newStep;
+            
+            // Si estamos en el último paso, mostrar resumen
+            if (newStep === 8) {
+                updateAssessmentSummary();
+            }
+        }
+
+        function updateAssessmentSummary() {
+            // Obtener valores del formulario (en una implementación real)
+            document.getElementById('summary-goal').textContent = 'Perder peso';
+            document.getElementById('summary-experience').textContent = 'Principiante';
+            document.getElementById('summary-frequency').textContent = '3 días';
+            document.getElementById('summary-equipment').textContent = 'Básico en casa';
+        }
+
+        function completeAssessment() {
+            showToast('Evaluación completada. Te hemos enviado un email con tu plan personalizado.', 'success');
+            
+            // Track GA4 event
+            trackGA4Event('assessment_complete', {
+                score: 85,
+                objective: 'weight_loss'
+            });
+            
+            // Cerrar modal después de un tiempo
+            setTimeout(() => {
+                closeModal();
+            }, 3000);
+        }
+
+        // Funciones para subida de vídeo
+        function setupVideoUpload() {
+            // Estos eventos se configurarán cuando se abra el modal
+        }
+
+        function initializeVideoUpload() {
+            const uploadZone = document.getElementById('upload-zone');
+            const fileInput = document.getElementById('video-file');
+            const submitButton = document.getElementById('submit-video');
+            
+            uploadZone.addEventListener('click', () => fileInput.click());
+            uploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadZone.classList.add('bg-gray-700');
+            });
+            uploadZone.addEventListener('dragleave', () => {
+                uploadZone.classList.remove('bg-gray-700');
+            });
+            uploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('bg-gray-700');
+                
+                if (e.dataTransfer.files.length) {
+                    handleVideoFile(e.dataTransfer.files[0]);
+                }
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) {
+                    handleVideoFile(e.target.files[0]);
+                }
+            });
+            
+            submitButton.addEventListener('click', submitVideoForReview);
+        }
+
+        function handleVideoFile(file) {
+            // Validar tipo y tamaño de archivo
+            const validTypes = ['video/mp4', 'video/quicktime'];
+            const maxSize = 100 * 1024 * 1024; // 100MB
+            
+            if (!validTypes.includes(file.type)) {
+                showToast('Formato de archivo no válido. Usa MP4 o MOV.', 'error');
+                return;
+            }
+            
+            if (file.size > maxSize) {
+                showToast('El archivo es demasiado grande (máx. 100MB). ¿Comprimir o subir por enlace?', 'error');
+                return;
+            }
+            
+            // Mostrar barra de progreso
+            document.getElementById('upload-progress').classList.remove('hidden');
+            
+            // Simular subida
+            simulateVideoUpload(file);
+        }
+
+        function simulateVideoUpload(file) {
+            let progress = 0;
+            const progressBar = document.getElementById('progress-bar');
+            const progressPercent = document.getElementById('progress-percent');
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // Mostrar confirmación
+                    showToast('Vídeo subido correctamente', 'success');
+                    
+                    // Track GA4 event
+                    trackGA4Event('tech_video_upload_complete', {
+                        exercise: document.getElementById('exercise-name').value,
+                        duration_s: Math.round(file.size / 100000) // Estimación aproximada
+                    });
+                }
+                
+                progressBar.style.width = `${progress}%`;
+                progressPercent.textContent = `${Math.round(progress)}%`;
+            }, 200);
+        }
+
+        function submitVideoForReview() {
+            const exercise = document.getElementById('exercise-name').value;
+            const videoUrl = document.getElementById('video-url').value;
+            
+            if (!exercise && !videoUrl) {
+                showToast('Por favor, sube un vídeo o introduce un enlace', 'error');
+                return;
+            }
+            
+            if (!exercise) {
+                showToast('Por favor, selecciona un ejercicio', 'error');
+                return;
+            }
+            
+            // Simular envío
+            document.getElementById('submission-confirmation').classList.remove('hidden');
+            
+            // Generar número de ticket
+            const ticketNumber = 'T-' + new Date().getFullYear() + '-' + Math.floor(Math.random() * 1000);
+            document.getElementById('ticket-number').textContent = ticketNumber;
+            
+            // Track GA4 event
+            trackGA4Event('tech_video_submit', {
+                exercise: exercise,
+                has_url: !!videoUrl
+            });
+        }
+
+        // Funciones para demo de la app
+        function initializeAppDemo() {
+            const pipButton = document.getElementById('pip-toggle');
+            const video = document.getElementById('app-demo-video');
+            const guestLogin = document.getElementById('guest-login');
+            const addToHomescreen = document.getElementById('add-to-homescreen');
+            
+            // Picture-in-Picture (solo compatible con algunos navegadores)
+            if (document.pictureInPictureEnabled) {
+                pipButton.classList.remove('hidden');
+                pipButton.addEventListener('click', togglePictureInPicture);
+            }
+            
+            guestLogin.addEventListener('click', () => {
+                showToast('Accediendo como invitado...', 'success');
+                // En una implementación real, aquí se redirigiría a la app en modo demo
+                
+                // Track GA4 event
+                trackGA4Event('demo_open', {
+                    mode: 'guest'
+                });
+            });
+            
+            addToHomescreen.addEventListener('click', () => {
+                showToast('Para añadir a pantalla de inicio, usa la opción "Añadir a pantalla de inicio" en el menú de tu navegador', 'info');
+                
+                // Track GA4 event
+                trackGA4Event('pwa_prompt', {
+                    context: 'demo_modal'
+                });
+            });
+        }
+
+        function togglePictureInPicture() {
+            const video = document.getElementById('app-demo-video');
+            
+            if (document.pictureInPictureElement) {
+                document.exitPictureInPicture();
+            } else {
+                video.requestPictureInPicture();
+            }
+        }
+
+        // Funciones para calculadora de macros
+        function setupMacroCalculator() {
+            // Estos eventos se configurarán cuando se abra el modal
+        }
+
+        function initializeMacroCalculator() {
+            document.getElementById('tdee-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculateTDEE();
+            });
+            
+            document.getElementById('save-to-profile').addEventListener('click', saveToProfile);
+            document.getElementById('export-pdf').addEventListener('click', exportMacrosPDF);
+            document.getElementById('apply-to-plan').addEventListener('click', applyToPlan);
+        }
+
+        function calculateTDEE() {
+            // Obtener valores del formulario
+            const gender = document.getElementById('gender').value;
+            const age = parseInt(document.getElementById('age').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const activity = parseFloat(document.getElementById('activity').value);
+            const goal = document.querySelector('input[name="goal"]:checked').value;
+            
+            // Validar entradas
+            if (!age || !weight || !height) {
+                showToast('Por favor, completa todos los campos', 'error');
+                return;
+            }
+            
+            // Calcular BMR (fórmula de Mifflin-St Jeor)
+            let bmr;
+            if (gender === 'male') {
+                bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+            } else {
+                bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+            }
+            
+            // Calcular TDEE
+            const tdee = bmr * activity;
+            
+            // Ajustar según objetivo
+            let goalCalories;
+            if (goal === 'loss') {
+                goalCalories = tdee - 500; // Déficit de 500 kcal
+            } else if (goal === 'gain') {
+                goalCalories = tdee + 300; // Superávit de 300 kcal
+            } else {
+                goalCalories = tdee; // Mantenimiento
+            }
+            
+            // Calcular macros (proporción estándar: 30% proteínas, 40% carbohidratos, 30% grasas)
+            const proteinGrams = Math.round((goalCalories * 0.3) / 4);
+            const carbsGrams = Math.round((goalCalories * 0.4) / 4);
+            const fatsGrams = Math.round((goalCalories * 0.3) / 9);
+            
+            // Mostrar resultados
+            document.getElementById('bmr-result').textContent = Math.round(bmr) + ' kcal';
+            document.getElementById('tdee-result-value').textContent = Math.round(tdee) + ' kcal';
+            document.getElementById('goal-calories').textContent = Math.round(goalCalories) + ' kcal';
+            document.getElementById('protein-grams').textContent = proteinGrams + 'g';
+            document.getElementById('carbs-grams').textContent = carbsGrams + 'g';
+            document.getElementById('fats-grams').textContent = fatsGrams + 'g';
+            
+            document.getElementById('tdee-result').classList.remove('hidden');
+            
+            // Track GA4 event
+            trackGA4Event('tdee_calculate', {
+                gender: gender,
+                age: age,
+                weight: weight,
+                height: height,
+                activity_level: activity,
+                goal: goal,
+                tdee: Math.round(tdee),
+                goal_calories: Math.round(goalCalories)
+            });
+        }
+
+        function saveToProfile() {
+            showToast('Macros guardados en tu perfil', 'success');
+            
+            // Track GA4 event
+            trackGA4Event('tdee_save_profile', {
+                context: 'macro_calculator'
+            });
+        }
+
+        function exportMacrosPDF() {
+            showToast('Generando PDF...', 'success');
+            // En una implementación real, aquí se generaría un PDF con los resultados
+            
+            // Track GA4 event
+            trackGA4Event('tdee_export_pdf', {
+                context: 'macro_calculator'
+            });
+        }
+
+        function applyToPlan() {
+            showToast('Aplicando macros a tu plan nutricional...', 'success');
+            // En una implementación real, aquí se actualizaría el plan del usuario
+            
+            // Track GA4 event
+            trackGA4Event('tdee_apply_plan', {
+                context: 'macro_calculator'
+            });
+        }
+
+        // Funciones para preferencias alimentarias
+        function setupFoodPreferences() {
+            // Estos eventos se configurarán cuando se abra el modal
+        }
+
+        function initializeFoodPreferences() {
+            document.getElementById('add-dislike').addEventListener('click', addDislike);
+            document.getElementById('dislike-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addDislike();
+                }
+            });
+            
+            document.getElementById('preferences-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                savePreferences();
+            });
+            
+            updateDislikesCounter();
+        }
+
+        function addDislike() {
+            const input = document.getElementById('dislike-input');
+            const food = input.value.trim();
+            
+            if (!food) return;
+            
+            if (dislikes.length >= 5) {
+                showToast('Máximo 5 alimentos no permitidos', 'error');
+                return;
+            }
+            
+            if (dislikes.includes(food)) {
+                showToast('Este alimento ya está en la lista', 'error');
+                return;
+            }
+            
+            dislikes.push(food);
+            
+            const chip = document.createElement('div');
+            chip.className = 'inline-flex items-center bg-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm';
+            chip.innerHTML = `
+                ${food}
+                <button type="button" class="ml-2 text-gray-400 hover:text-white" data-food="${food}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            `;
+            
+            chip.querySelector('button').addEventListener('click', function() {
+                const foodToRemove = this.getAttribute('data-food');
+                dislikes = dislikes.filter(f => f !== foodToRemove);
+                chip.remove();
+                updateDislikesCounter();
+            });
+            
+            document.getElementById('dislikes-chips').appendChild(chip);
+            input.value = '';
+            updateDislikesCounter();
+        }
+
+        function updateDislikesCounter() {
+            document.getElementById('dislikes-counter').textContent = `${dislikes.length}/5`;
+        }
+
+        function savePreferences() {
+            showToast('Preferencias guardadas correctamente', 'success');
+            
+            // Track GA4 event
+            trackGA4Event('prefs_save', {
+                dislikes_count: dislikes.length,
+                has_allergies: document.querySelector('input[name="allergies"]:checked') !== null
+            });
+        }
+
+        // Funciones para lista de compra
+        function setupGroceryList() {
+            // Estos eventos se configurarán cuando se abra el modal
+        }
+
+        function initializeGroceryList() {
+            // Contador de artículos
+            document.querySelectorAll('.grocery-item').forEach(item => {
+                item.addEventListener('change', updateItemCount);
+            });
+            
+            document.getElementById('exclude-basics').addEventListener('change', updateItemCount);
+            
+            // Botones de exportación
+            document.getElementById('export-grocery-pdf').addEventListener('click', exportGroceryPDF);
+            document.getElementById('export-grocery-csv').addEventListener('click', exportGroceryCSV);
+            document.getElementById('share-grocery-whatsapp').addEventListener('click', shareGroceryWhatsApp);
+            document.getElementById('send-grocery-email').addEventListener('click', sendGroceryEmail);
+            
+            updateItemCount();
+        }
+
+        function updateItemCount() {
+            const excludeBasics = document.getElementById('exclude-basics').checked;
+            let count = 0;
+            
+            document.querySelectorAll('.grocery-item').forEach(item => {
+                if (item.checked) {
+                    count++;
+                }
+            });
+            
+            document.getElementById('item-count').textContent = `${count} artículos`;
+        }
+
+        function exportGroceryPDF() {
+            showToast('Generando PDF de la lista de compra...', 'success');
+            
+            // Track GA4 event
+            trackGA4Event('grocery_export', {
+                format: 'pdf',
+                item_count: document.querySelectorAll('.grocery-item:checked').length
+            });
+        }
+
+        function exportGroceryCSV() {
+            showToast('Descargando CSV de la lista de compra...', 'success');
+            
+            // Track GA4 event
+            trackGA4Event('grocery_export', {
+                format: 'csv',
+                item_count: document.querySelectorAll('.grocery-item:checked').length
+            });
+        }
+
+        function shareGroceryWhatsApp() {
+            const selectedItems = Array.from(document.querySelectorAll('.grocery-item:checked'))
+                .map(item => item.nextElementSibling.textContent)
+                .join(', ');
+            
+            const message = `Mi lista de la compra semanal: ${selectedItems}`;
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+            
+            // Track GA4 event
+            trackGA4Event('grocery_share', {
+                method: 'whatsapp',
+                item_count: document.querySelectorAll('.grocery-item:checked').length
+            });
+        }
+
+        function sendGroceryEmail() {
+            showToast('Enviando lista de compra por email...', 'success');
+            
+            // Track GA4 event
+            trackGA4Event('grocery_share', {
+                method: 'email',
+                item_count: document.querySelectorAll('.grocery-item:checked').length
+            });
+        }
+
+        // Funciones de utilidad
+        function showToast(message, type) {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            let icon = '';
+            if (type === 'success') {
+                icon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>';
+            } else if (type === 'error') {
+                icon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>';
+            } else {
+                icon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>';
+            }
+            
+            toast.innerHTML = `
+                ${icon}
+                <span>${message}</span>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Mostrar toast
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+            
+            // Ocultar y eliminar toast después de 5 segundos
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 5000);
+        }
+
+        function createConfetti() {
+            const colors = ['#34d399', '#10b981', '#059669', '#047857', '#065f46'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = confetti.style.width;
+                
+                document.body.appendChild(confetti);
+                
+                // Animación
+                const animation = confetti.animate([
+                    { transform: 'translateY(-100vh) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 3000 + 2000,
+                    easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)'
+                });
+                
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+
+        function trackGA4Event(eventName, params) {
+            // En una implementación real, aquí se enviaría el evento a Google Analytics 4
+            console.log('GA4 Event:', eventName, params);
+            
+            // Simulación de envío
+            if (typeof gtag !== 'undefined') {
+                gtag('event', eventName, params);
+            }
+        }
+
+        function getServiceFromButton(button) {
+            // Determinar el servicio basado en la posición del botón o sus atributos
+            const card = button.closest('.bg-gray-900');
+            if (card) {
+                const title = card.querySelector('h3').textContent;
+                if (title.includes('Personal')) return 'personal_training';
+                if (title.includes('Online')) return 'online_coaching';
+                if (title.includes('Nutrición')) return 'nutrition_plan';
+            }
+            return 'unknown';
+        }
+
+        function isMobile() {
+            return window.innerWidth < 768;
+        }
+
+        function simulateInitialDataLoad() {
+            // Simular carga de próximo horario
+            setTimeout(() => {
+                document.getElementById('next-slot-chip').textContent = 'Próximo: 10:00';
+            }, 1000);
+            
+            // Simular carga de slots de disponibilidad
+            setTimeout(() => {
+                simulateAvailabilitySlots();
+            }, 1500);
+            
+            // Simular carga de slots de prueba
+            setTimeout(() => {
+                const trialSlotsContainer = document.getElementById('trial-slots');
+                if (trialSlotsContainer) {
+                    trialSlotsContainer.innerHTML = `
+                        <div class="p-2 border border-gray-600 rounded-lg text-center bg-gray-700">
+                            <div class="font-semibold">10:00</div>
+                            <div class="text-sm text-gray-400">Hoy</div>
+                        </div>
+                        <div class="p-2 border border-gray-600 rounded-lg text-center bg-gray-700">
+                            <div class="font-semibold">16:30</div>
+                            <div class="text-sm text-gray-400">Hoy</div>
+                        </div>
+                    `;
+                }
+            }, 1500);
+        }
+
+        function simulateAvailabilitySlots() {
+            const slotsContainer = document.getElementById('availability-slots');
+            if (!slotsContainer) return;
+            
+            slotsContainer.innerHTML = '';
+            
+            const slots = [
+                { time: '10:00', date: 'Hoy', available: true },
+                { time: '11:30', date: 'Hoy', available: true },
+                { time: '16:00', date: 'Hoy', available: false },
+                { time: '17:30', date: 'Hoy', available: true },
+                { time: '19:00', date: 'Hoy', available: true },
+                { time: '09:00', date: 'Mañana', available: true },
+                { time: '10:30', date: 'Mañana', available: true }
+            ];
+            
+            slots.forEach(slot => {
+                const slotElement = document.createElement('div');
+                slotElement.className = `p-3 border border-gray-600 rounded-lg cursor-pointer text-center ${slot.available ? 'hover:bg-green-500 hover:text-gray-900' : 'opacity-50 cursor-not-allowed'}`;
+                slotElement.innerHTML = `
+                    <div class="font-semibold">${slot.time}</div>
+                    <div class="text-sm text-gray-400">${slot.date}</div>
+                `;
+                
+                if (slot.available) {
+                    slotElement.addEventListener('click', () => {
+                        // Al hacer clic en un slot, ir al flujo de reserva con este slot preseleccionado
+                        closeAvailabilityDrawer();
+                        openModal('reservar-sesion');
+                        
+                        // Track GA4 event
+                        trackGA4Event('slot_preview_click', {
+                            slot_iso: `${slot.date}_${slot.time}`
+                        });
+                    });
+                }
+                
+                slotsContainer.appendChild(slotElement);
+            });
+        }
+
+        function simulateOnlineStatus() {
+            // Simular cambio de estado online/offline
+            setInterval(() => {
+                const statusElement = document.getElementById('online-status');
+                if (statusElement) {
+                    const isOnline = Math.random() > 0.3; // 70% de probabilidad de estar online
+                    if (isOnline) {
+                        statusElement.textContent = 'Estoy online';
+                        statusElement.classList.remove('bg-red-500/10', 'text-red-400');
+                        statusElement.classList.add('bg-green-500/10', 'text-green-400');
+                    } else {
+                        statusElement.textContent = 'Vuelvo a las 16:00';
+                        statusElement.classList.remove('bg-green-500/10', 'text-green-400');
+                        statusElement.classList.add('bg-red-500/10', 'text-red-400');
+                    }
+                }
+            }, 30000); // Cambiar cada 30 segundos
+        }
+
+        // Inicializar componentes cuando se abren modales específicos
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('[data-modal-target]')) {
+                const modalId = e.target.closest('[data-modal-target]').getAttribute('data-modal-target');
+                
+                // Pequeño retraso para asegurar que el modal se ha abierto
+                setTimeout(() => {
+                    if (modalId === 'entrena-grupo') {
+                        initializeGroupTraining();
+                    } else if (modalId === 'evaluacion-inicial') {
+                        initializeAssessmentQuiz();
+                    } else if (modalId === 'enviar-video') {
+                        initializeVideoUpload();
+                    } else if (modalId === 'calcular-macros') {
+                        initializeMacroCalculator();
+                    } else if (modalId === 'preferencias') {
+                        initializeFoodPreferences();
+                    } else if (modalId === 'lista-compra') {
+                        initializeGroceryList();
+                    }
+                }, 100);
+            }
+        });
+
+        // Cerrar drawer al hacer clic fuera de él
+        document.addEventListener('click', function(e) {
+            const drawer = document.getElementById('availability-drawer');
+            if (drawer && drawer.classList.contains('open') && 
+                !drawer.contains(e.target) && 
+                e.target.id !== 'open-availability-drawer') {
+                closeAvailabilityDrawer();
+            }
+        });
+
+        // Manejar tecla Escape para cerrar modales y drawers
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeAvailabilityDrawer();
+            }
+        });
+    </script>
+</body>
+</html>
