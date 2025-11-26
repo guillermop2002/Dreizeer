@@ -35,6 +35,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     keywords: `entrenador personal ${displayNeighborhood}, entrenador personal ${displayCity}, entrenamiento a domicilio ${displayNeighborhood}, entrenamiento al aire libre ${displayCity}`,
+    // IMPORTANTE: robots noindex para demo - prevenir indexación
+    robots: {
+      index: false,
+      follow: false,
+    },
     alternates: {
       canonical: `/${city}/${neighborhood}`,
     },
