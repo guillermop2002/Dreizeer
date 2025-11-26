@@ -33,7 +33,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     title: 'Small Group Training',
     precioMostrado: 'Desde 25€/persona',
     precioSchema: '25.00',
-    detalles: 'Pack mensual desde 75€',
+    detalles: 'Sesión grupal desde 75€',
     tipo: 'group',
   },
   {
