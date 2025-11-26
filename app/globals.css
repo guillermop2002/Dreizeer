@@ -16,6 +16,8 @@ html {
   background-color: var(--color-neutral-900);
   /* Prevenir scroll bounce mostrando fondo diferente */
   overflow-x: hidden;
+  /* Forzar altura mínima */
+  min-height: 100%;
 }
 
 body {
@@ -27,5 +29,21 @@ body {
   /* Mejor rendering en iOS */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Asegurar que el body cubra toda la pantalla */
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  position: relative;
 }
 
+/* Fix adicional para iOS Safari - Fondo fijo que cubre todo */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-neutral-900);
+  z-index: -1;
+  pointer-events: none;
+}

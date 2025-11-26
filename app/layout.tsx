@@ -35,11 +35,12 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  // Meta tags para iOS Safari - prevenir fondo rojo
+  // Meta tags para iOS Safari - prevenir fondo rojo y deshabilitar zoom
   viewport: {
     width: 'device-width',
     initialScale: 1,
-    maximumScale: 5,
+    maximumScale: 1, // Deshabilitar zoom
+    userScalable: false, // Prevenir pellizcar para zoom
   },
   themeColor: '#111827', // Mismo color que background (neutral-900)
   title: {
