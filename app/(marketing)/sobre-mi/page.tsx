@@ -97,7 +97,7 @@ const faqItems = [
   },
   {
     question: "¿Trabajas con personas mayores?",
-    answer: "Sí, tengo experiencia especializada en gimnasia a domicilio para tercera edad. Trabajo en colaboración con centros municipales y adapto los ejercicios a movilidad reducida, siempre priorizando la seguridad y el bienestar.",
+    answer: "Sí, tengo experiencia especializada en gimnasia a domicilio para tercera edad. Ofrezco servicios adaptados para usuarios de centros municipales y ajusto los ejercicios a movilidad reducida, siempre priorizando la seguridad y el bienestar.",
   },
 ];
 

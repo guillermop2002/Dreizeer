@@ -184,11 +184,11 @@ export default function TerceraEdadPage() {
                   </svg>
                 </div>
                 <h3 className="text-2xl font-bold mb-3" style={{ color: '#ffffff', fontSize: '1.5rem' }}>
-                  Colaboración con Centros Municipales
+                  Servicio Disponible para Centros Municipales
                 </h3>
                 <p className="leading-relaxed" style={{ color: '#f3f4f6', fontSize: '1.25rem' }}>
-                  Trabajamos en colaboración con centros municipales y asociaciones para ofrecer
-                  programas de envejecimiento activo accesibles y de calidad.
+                  Ofrecemos programas adaptados para centros municipales y asociaciones para facilitar
+                  actividades de envejecimiento activo accesibles y de calidad.
                 </p>
               </div>
             </div>
@@ -376,7 +376,7 @@ export default function TerceraEdadPage() {
                     <svg className="w-6 h-6 mr-3 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-brand-primary)' }} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span>Colaboración con centros municipales disponible</span>
+                    <span>Descuentos para grupos de centros municipales</span>
                   </li>
                 </ul>
 
@@ -421,7 +421,7 @@ export default function TerceraEdadPage() {
               style={{ color: '#d1d5db', fontSize: '1.125rem' }}
             >
               Ofrecemos una primera sesión de valoración gratuita para conocerte y explicarte
-              cómo podemos ayudarte. También trabajamos en colaboración con centros municipales
+              cómo podemos ayudarte. También ofrecemos servicios especiales para grupos de centros municipales
               para facilitar el acceso a nuestros servicios.
             </p>
             <a
