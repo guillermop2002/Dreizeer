@@ -35,6 +35,13 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  // Meta tags para iOS Safari - prevenir fondo rojo
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+  },
+  themeColor: '#111827', // Mismo color que background (neutral-900)
   title: {
     default: "Dreizeer - Entrenador Personal en Madrid | A Domicilio y Online",
     template: "%s | Dreizeer",
