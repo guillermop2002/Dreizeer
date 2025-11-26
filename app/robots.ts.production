@@ -1,0 +1,36 @@
+import { MetadataRoute } from 'next';
+
+/**
+ * PRODUCCIÓN: robots.ts - PERMITE INDEXACIÓN
+ * Este archivo permite la indexación para producción
+ * Para usar en producción: renombrar a robots.ts
+ */
+
+export default function robots(): MetadataRoute.Robots {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://dreizeer.com';
+
+  return {
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: [
+          '/admin', // Panel de administración
+          '/api', // Rutas de API si las hay
+        ],
+      },
+      // Permitir específicamente a Googlebot
+      {
+        userAgent: 'Googlebot',
+        allow: '/',
+        disallow: ['/admin'],
+      },
+      // Permitir a otros bots importantes
+      {
+        userAgent: ['Googlebot-Image', 'Bingbot'],
+        allow: '/',
+      },
+    ],
+    sitemap: `${baseUrl}/sitemap.xml`,
+  };
+}
