@@ -1,36 +1,20 @@
 import { MetadataRoute } from 'next';
 
 /**
- * Robots.txt para control de indexación
- * Permite la indexación de todas las rutas generadas
+ * IMPORTANTE: robots.ts para DEMO - NO INDEXAR
+ * Este archivo bloquea TODOS los bots de búsqueda para evitar indexación
+ * Para producción: renombrar a robots.ts.backup y usar robots.ts.production
  */
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://dreizeer.com';
-
+  // DEMO: Bloquear todo para evitar indexación
   return {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
-        disallow: [
-          '/admin', // Panel de administración
-          '/api', // Rutas de API si las hay
-        ],
-      },
-      // Permitir específicamente a Googlebot
-      {
-        userAgent: 'Googlebot',
-        allow: '/',
-        disallow: ['/admin'],
-      },
-      // Permitir a otros bots importantes
-      {
-        userAgent: ['Googlebot-Image', 'Bingbot'],
-        allow: '/',
+        disallow: '/', // Bloquear TODO
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
   };
 }
 
