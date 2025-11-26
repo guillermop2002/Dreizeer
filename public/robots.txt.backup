@@ -1,0 +1,9 @@
+# robots.txt - PRODUCCIÓN (BACKUP)
+# Este archivo permite la indexación en buscadores
+# Para usarlo en producción, renombra este archivo a robots.txt
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://tu-dominio.com/sitemap.xml

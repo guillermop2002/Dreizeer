@@ -1,0 +1,5 @@
+# robots.txt - NO INDEXAR
+# Este archivo bloquea todos los bots de búsqueda
+
+User-agent: *
+Disallow: /
