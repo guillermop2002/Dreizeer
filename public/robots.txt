@@ -1,5 +1,5 @@
-# robots.txt - NO INDEXAR
-# Este archivo bloquea todos los bots de búsqueda
+# robots.txt - PRODUCCIÓN
+# Este archivo permite el acceso a todos los bots de búsqueda
 
 User-agent: *
 Allow: /
