@@ -52,7 +52,7 @@ export default function TerceraEdadPage() {
             addressRegion: 'Comunidad de Madrid',
             addressCountry: 'ES',
           },
-          url: "https://dreizeer.com/tercera-edad",
+          url: "https://dreizeer.es/tercera-edad",
         }}
       />
       <SchemaScript

@@ -13,7 +13,7 @@ const inter = Inter({
 });
 
 // Definición de la URL base con fallback seguro
-// En producción, usar NEXT_PUBLIC_SITE_URL (ej: "dreizeer.com" sin https://)
+// En producción, usar NEXT_PUBLIC_SITE_URL (ej: "dreizeer.es" sin https://)
 // En desarrollo, usar localhost:3000
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
   ? `https://${process.env.NEXT_PUBLIC_SITE_URL.replace(/^https?:\/\//, '')}`

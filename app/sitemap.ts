@@ -8,7 +8,7 @@ import { MetadataRoute } from 'next';
 // Base URL del sitio
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
     ? `https://${process.env.NEXT_PUBLIC_SITE_URL.replace(/^https?:\/\//, '')}`
-    : 'https://dreizeer.com';
+    : 'https://dreizeer.es';
 
 // Definición de barrios para páginas locales dinámicas
 const neighborhoods = [

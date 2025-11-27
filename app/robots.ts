@@ -15,7 +15,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: '/private/', // Ejemplo de ruta protegida si existiera
       },
     ],
-    sitemap: 'https://dreizeer.com/sitemap.xml',
+    sitemap: 'https://dreizeer.es/sitemap.xml',
   };
 }
 

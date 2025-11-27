@@ -47,7 +47,7 @@ export function generateLocalBusinessSchema(params: LocalBusinessSchemaParams): 
     priceRange = '€€',
     telephone = '+34637453753',
     email = 'dreizeer@gmail.com',
-    url = 'https://dreizeer.com',
+    url = 'https://dreizeer.es',
     image,
     address,
   } = params;
@@ -219,7 +219,7 @@ export function generateOnlineBusinessSchema(params: OnlineBusinessSchemaParams)
     priceRange = '€€',
     telephone = '+34637453753',
     email = 'dreizeer@gmail.com',
-    url = 'https://dreizeer.com',
+    url = 'https://dreizeer.es',
     image,
   } = params;
 
@@ -312,7 +312,7 @@ export function generatePersonSchema(params: {
     name,
     jobTitle,
     description,
-    url = 'https://dreizeer.com',
+    url = 'https://dreizeer.es',
     email = 'dreizeer@gmail.com',
     telephone = '+34637453753',
     image,

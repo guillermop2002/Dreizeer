@@ -48,7 +48,7 @@ export default function OnlineCoachingPage() {
           description: "Planificación personalizada con entrenador humano real. Videoanálisis y corrección de técnica que las apps de IA no pueden ofrecer.",
           areaServed: "Global",
           priceRange: "desde 50€/mes",
-          url: "https://dreizeer.com/online-coaching",
+          url: "https://dreizeer.es/online-coaching",
         }}
       />
       <SchemaScript

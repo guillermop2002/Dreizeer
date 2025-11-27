@@ -3,5 +3,5 @@
 
 User-agent: *
 Allow: /
-Sitemap: https://dreizeer.com/sitemap.xml
+Sitemap: https://dreizeer.es/sitemap.xml
 

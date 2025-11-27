@@ -119,7 +119,7 @@ export default function SobreMiPage() {
           name: "Dreizeer",
           jobTitle: "Entrenador Personal Especializado",
           description: "Ciencia del Movimiento con Base en Madrid y Alcance Global. Especialista con Máster en Rendimiento Deportivo, entrenamiento híbrido y corrección de técnica.",
-          url: "https://dreizeer.com/sobre-mi",
+          url: "https://dreizeer.es/sobre-mi",
           email: "dreizeer@gmail.com",
           telephone: "+34637453753",
         }}

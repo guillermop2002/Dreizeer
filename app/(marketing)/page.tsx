@@ -57,7 +57,7 @@ export default function HomePage() {
             addressRegion: 'Comunidad de Madrid',
             addressCountry: 'ES',
           },
-          url: "https://dreizeer.com",
+          url: "https://dreizeer.es",
         }}
       />
       <div className="min-h-screen" style={{ backgroundColor: 'var(--color-neutral-900)' }}>

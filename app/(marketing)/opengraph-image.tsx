@@ -86,7 +86,7 @@ export default async function Image() {
             MADRID • ONLINE • DOMICILIO
           </div>
         </div>
-        
+
         <div
           style={{
             position: 'absolute',
@@ -96,7 +96,7 @@ export default async function Image() {
             gap: 20,
           }}
         >
-          <div style={{ fontSize: 24, color: '#ef4444', fontWeight: 600 }}>dreizeer.com</div>
+          <div style={{ fontSize: 24, color: '#ef4444', fontWeight: 600 }}>dreizeer.es</div>
         </div>
       </div>
     ),
