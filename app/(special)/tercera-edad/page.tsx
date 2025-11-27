@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   description: "Ejercicios para mayores de 65 años adaptados a movilidad reducida. Gimnasia a domicilio y envejecimiento activo con entrenador personal especializado.",
   keywords: "gimnasia a domicilio, envejecimiento activo, ejercicios para mayores de 65, movilidad reducida, entrenador personal tercera edad",
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
   },
   alternates: {
     canonical: '/tercera-edad',

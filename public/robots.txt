@@ -2,4 +2,5 @@
 # Este archivo bloquea todos los bots de búsqueda
 
 User-agent: *
-Disallow: /
+Allow: /
+Sitemap: https://dreizeer.com/sitemap.xml

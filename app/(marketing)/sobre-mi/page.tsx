@@ -15,8 +15,8 @@ export const metadata: Metadata = {
   description: "Ciencia del Movimiento con Base en Madrid y Alcance Global. Entrenador personal especializado con Máster en Rendimiento Deportivo, entrenamiento híbrido y corrección de técnica.",
   keywords: "entrenador personal Madrid, máster rendimiento deportivo, entrenamiento híbrido, corrección técnica, entrenador certificado",
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
   },
   alternates: {
     canonical: '/sobre-mi',

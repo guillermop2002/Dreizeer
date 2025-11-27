@@ -7,14 +7,16 @@ import { MetadataRoute } from 'next';
  */
 
 export default function robots(): MetadataRoute.Robots {
-  // DEMO: Bloquear todo para evitar indexación
+  // PRODUCCIÓN: Permitir indexación
   return {
     rules: [
       {
         userAgent: '*',
-        disallow: '/', // Bloquear TODO
+        allow: '/',
+        disallow: '/private/', // Ejemplo de ruta protegida si existiera
       },
     ],
+    sitemap: 'https://dreizeer.com/sitemap.xml',
   };
 }
 
