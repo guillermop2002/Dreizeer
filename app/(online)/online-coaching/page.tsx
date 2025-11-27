@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   description: "Planificación personalizada con entrenador humano real. Videoanálisis y corrección de técnica que las apps de IA no pueden ofrecer. Desde 50€/mes.",
   keywords: "corrección de técnica, videoanálisis, planificación personalizada, entrenador humano, entrenamiento online, coaching online",
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
   },
   alternates: {
     canonical: '/online-coaching',

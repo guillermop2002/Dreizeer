@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     canonical: '/privacidad',
   },
   robots: {
-    index: false,
+    index: true,
     follow: true,
   },
   openGraph: {

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     canonical: '/terminos',
   },
   robots: {
-    index: false,
+    index: true,
     follow: true,
   },
   openGraph: {

@@ -16,8 +16,8 @@ export const metadata: Metadata = {
   description: "Entrenador personal especializado en Madrid y Rivas-Vaciamadrid. Entrenamiento a domicilio, al aire libre y online con corrección de técnica. Precios desde 25€/persona en grupos, desde 40€/sesión individual.",
   keywords: "entrenador personal Madrid, entrenador personal Rivas, entrenamiento a domicilio, entrenamiento online, corrección de técnica, máster rendimiento deportivo",
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
   },
   alternates: {
     canonical: '/',

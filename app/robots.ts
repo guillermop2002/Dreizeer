@@ -1,20 +1,21 @@
 import { MetadataRoute } from 'next';
 
 /**
- * IMPORTANTE: robots.ts para DEMO - NO INDEXAR
- * Este archivo bloquea TODOS los bots de búsqueda para evitar indexación
- * Para producción: renombrar a robots.ts.backup y usar robots.ts.production
+ * Configuración de robots.ts para PRODUCCIÓN
+ * Permite la indexación de todo el sitio.
  */
 
 export default function robots(): MetadataRoute.Robots {
-  // DEMO: Bloquear todo para evitar indexación
+  // PRODUCCIÓN: Permitir indexación
   return {
     rules: [
       {
         userAgent: '*',
-        disallow: '/', // Bloquear TODO
+        allow: '/',
+        disallow: '/private/', // Ejemplo de ruta protegida si existiera
       },
     ],
+    sitemap: 'https://dreizeer.com/sitemap.xml',
   };
 }
 
