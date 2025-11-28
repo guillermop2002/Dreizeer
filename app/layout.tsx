@@ -57,6 +57,9 @@ export const metadata: Metadata = {
     description: 'Entrenador personal especializado en Madrid y Rivas-Vaciamadrid. Entrenamiento a domicilio, al aire libre y online con corrección de técnica.',
     url: baseUrl,
   },
+  verification: {
+    google: 'XwRv2zmtv5CU6QUC8QELCzcAf2Jv_f1h63Tv2oIIs9U',
+  },
 };
 
 export default function RootLayout({
