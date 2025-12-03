@@ -102,7 +102,7 @@ export function getCurrentMonthlyOffer(): MonthlyOffer {
     return {
       title: 'Clase Extra GRATIS',
       value: '40€',
-      description: 'Al contratar tu primer bono mensual',
+      description: 'Al contratar tu primera clase',
       validThrough: validThroughISO,
     };
   }
